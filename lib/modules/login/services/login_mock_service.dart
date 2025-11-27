@@ -1,4 +1,4 @@
-import '../models/login_model.dart';
+import '../models/login_response.dart';
 
 class LoginMockService {
   Future<LoginResponse> login(String username, String password) async {
