@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'core/styles/theme.dart';
 import 'core/utils/constants.dart';
+import 'core/utils/route_constants.dart';
 import 'modules/login/views/login_view.dart';
 import 'modules/home/views/home_view.dart';
 import 'modules/user_list/views/user_list_view.dart';
@@ -31,12 +32,12 @@ class MyApp extends StatelessWidget {
         title: AppConstants.appName,
         theme: AppTheme.lightTheme,
         debugShowCheckedModeBanner: false,
-        initialRoute: AppConstants.loginRoute,
+        initialRoute: RouteConstants.loginRoute,
         routes: {
-          AppConstants.loginRoute: (context) => const LoginView(),
-          AppConstants.homeRoute: (context) => const HomeView(),
-          AppConstants.userListRoute: (context) => const UserListView(),
-          AppConstants.userDetailRoute: (context) => const UserDetailView(),
+          RouteConstants.loginRoute: (context) => const LoginView(),
+          RouteConstants.homeRoute: (context) => const HomeView(),
+          RouteConstants.userListRoute: (context) => const UserListView(),
+          RouteConstants.userDetailRoute: (context) => const UserDetailView(),
         },
       ),
     );

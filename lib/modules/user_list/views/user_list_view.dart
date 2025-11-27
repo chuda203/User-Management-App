@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import '../../../core/utils/constants.dart';
+import '../../../core/utils/route_constants.dart';
 import '../components/user_list_tile.dart';
 import '../view_models/user_list_view_model.dart';
 
@@ -61,7 +61,7 @@ class _UserListViewState extends State<UserListView> {
                         onTap: () {
                           Navigator.pushNamed(
                             context,
-                            AppConstants.userDetailRoute,
+                            RouteConstants.userDetailRoute,
                             arguments: {
                               'id': user.id,
                               'fromHome': false,
