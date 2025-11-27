@@ -1,0 +1,10 @@
+/lib/;
+/lib/core/ (components, styles, utils, dsb.);
+/lib/modules/login/components/ (isi seperlunya, biasakan pecah isi view jadi component);
+/lib/modules/login/views/login_view.dart;
+/lib/modules/login/view_models/login_view_model.dart;
+/lib/modules/login/models/ (isi seperlunya dengan kelas model data yang diperlukan);
+/lib/modules/login/services/login_mock_service.dart (sesuaikan “mock” dengan sumber data);
+/lib/modules/home/ (sama seperti model diatas);
+/lib/modules/user_list/ (sama seperti model diatas);
+/lib/modules/user_detail/ (sama seperti model diatas);
