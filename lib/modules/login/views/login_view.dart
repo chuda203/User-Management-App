@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import '../../../core/utils/constants.dart';
+import '../../../core/utils/route_constants.dart';
 import '../components/login_form_component.dart';
 import '../view_models/login_view_model.dart';
 
@@ -35,7 +35,7 @@ class _LoginViewState extends State<LoginView> {
       );
 
       if (response.success && mounted) {
-        Navigator.pushReplacementNamed(context, AppConstants.homeRoute);
+        Navigator.pushReplacementNamed(context, RouteConstants.homeRoute);
       } else {
         // Handle login failure if needed
       }

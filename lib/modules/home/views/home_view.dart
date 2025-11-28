@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import '../../../core/utils/constants.dart';
+import '../../../core/utils/route_constants.dart';
 import '../view_models/home_view_model.dart';
 import '../components/user_list_item.dart';
 import '../../user_list/view_models/user_list_view_model.dart';
@@ -30,7 +30,7 @@ class _HomeViewState extends State<HomeView> {
           IconButton(
             icon: const Icon(Icons.logout),
             onPressed: () {
-              Navigator.pushReplacementNamed(context, AppConstants.loginRoute);
+              Navigator.pushReplacementNamed(context, RouteConstants.loginRoute);
             },
           ),
         ],
@@ -71,7 +71,7 @@ class _HomeViewState extends State<HomeView> {
                             // For detail view, pass the user ID so the detail view can fetch original data
                             Navigator.pushNamed(
                               context,
-                              AppConstants.userDetailRoute,
+                              RouteConstants.userDetailRoute,
                               arguments: {
                                 'id': user.id,
                                 'fromHome': true,
@@ -94,7 +94,7 @@ class _HomeViewState extends State<HomeView> {
                             userListViewModel.initializeUsers();
                             Navigator.pushNamed(
                               context,
-                              AppConstants.userListRoute,
+                              RouteConstants.userListRoute,
                             );
                           },
                           style: ElevatedButton.styleFrom(
