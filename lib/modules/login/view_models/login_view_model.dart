@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import '../models/login_model.dart';
+import '../models/login_response.dart';
 import '../services/login_mock_service.dart';
 
 class LoginViewModel extends ChangeNotifier {
