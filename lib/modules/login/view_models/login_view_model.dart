@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import '../models/login_response.dart';
-import '../services/login_mock_service.dart';
+import '../services/login_api_service.dart';
 
 class LoginViewModel extends ChangeNotifier {
-  final LoginMockService _loginService = LoginMockService();
+  final LoginApiService _loginService = LoginApiService();
 
   bool _isLoading = false;
   bool get isLoading => _isLoading;
@@ -47,5 +47,17 @@ class LoginViewModel extends ChangeNotifier {
 
   void clearError() {
     _setErrorMessage(null);
+  }
+
+  Future<void> logout() async {
+    await _loginService.logout();
+  }
+
+  Future<String?> getSavedToken() async {
+    return await _loginService.getSavedToken();
+  }
+
+  Future<bool> hasValidToken() async {
+    return await _loginService.hasValidToken();
   }
 }

@@ -4,6 +4,7 @@ import 'package:provider/provider.dart';
 import '../../../core/utils/route_constants.dart';
 import '../view_models/splash_view_model.dart';
 import '../components/splash_component.dart';
+import '../../login/view_models/login_view_model.dart';
 
 class SplashView extends StatefulWidget {
   const SplashView({super.key});
@@ -21,10 +22,20 @@ class _SplashViewState extends State<SplashView> {
 
   void _navigateToNextScreen() async {
     // Simulate loading time for splash screen
-    await Future.delayed(const Duration(seconds: 3));
+    await Future.delayed(const Duration(seconds: 2));
 
-    // Always go to login screen after splash - no auth check for now
-    Navigator.of(context).pushReplacementNamed(RouteConstants.loginRoute);
+    // Check if user has valid token
+    LoginViewModel loginViewModel = context.read<LoginViewModel>();
+    bool hasValidToken = await loginViewModel.hasValidToken();
+
+    // Navigate based on authentication status
+    if (hasValidToken) {
+      // User is authenticated, go to home screen
+      Navigator.of(context).pushReplacementNamed(RouteConstants.homeRoute);
+    } else {
+      // User is not authenticated, go to login screen
+      Navigator.of(context).pushReplacementNamed(RouteConstants.loginRoute);
+    }
   }
 
   @override
