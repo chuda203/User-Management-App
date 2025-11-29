@@ -1,7 +1,7 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 import '../models/login_response.dart';
-import 'package:shared_preferences/shared_preferences.dart';
+import '../../../core/services/auth_storage_service.dart';
 
 class LoginApiService {
   static const String _baseUrl = 'https://reqres.in/api/login';
@@ -25,8 +25,7 @@ class LoginApiService {
         final data = jsonDecode(response.body);
         String token = data['token'] ?? '';
 
-        SharedPreferences prefs = await SharedPreferences.getInstance();
-        await prefs.setString('auth_token', token);
+        await AuthStorageService.saveToken(token);
 
         return LoginResponse(
           token: token,
@@ -50,17 +49,14 @@ class LoginApiService {
   }
 
   Future<void> logout() async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    await prefs.remove('auth_token');
+    await AuthStorageService.removeToken();
   }
 
   Future<String?> getSavedToken() async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    return prefs.getString('auth_token');
+    return await AuthStorageService.getToken();
   }
 
   Future<bool> hasValidToken() async {
-    String? token = await getSavedToken();
-    return token != null && token.isNotEmpty;
+    return await AuthStorageService.hasToken();
   }
 }

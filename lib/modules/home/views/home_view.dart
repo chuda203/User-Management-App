@@ -4,6 +4,7 @@ import '../../../core/utils/route_constants.dart';
 import '../view_models/home_view_model.dart';
 import '../components/user_list_item.dart';
 import '../../user_list/view_models/user_list_view_model.dart';
+import '../../login/view_models/login_view_model.dart';
 
 class HomeView extends StatefulWidget {
   const HomeView({super.key});
@@ -19,6 +20,18 @@ class _HomeViewState extends State<HomeView> {
     Provider.of<HomeViewModel>(context, listen: false).initializeUsers();
   }
 
+  void _performLogout() async {
+    // Get the LoginViewModel to handle the logout
+    LoginViewModel loginViewModel = context.read<LoginViewModel>();
+    HomeViewModel homeViewModel = context.read<HomeViewModel>();
+
+    // Perform the logout which clears the token
+    await homeViewModel.logout(loginViewModel);
+
+    // Navigate back to login screen
+    Navigator.pushReplacementNamed(context, RouteConstants.loginRoute);
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -29,9 +42,7 @@ class _HomeViewState extends State<HomeView> {
         actions: [
           IconButton(
             icon: const Icon(Icons.logout),
-            onPressed: () {
-              Navigator.pushReplacementNamed(context, RouteConstants.loginRoute);
-            },
+            onPressed: _performLogout,
           ),
         ],
       ),

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../../../core/models/user.dart';
 import '../services/home_service.dart';
+import '../../login/view_models/login_view_model.dart';
 
 class HomeViewModel extends ChangeNotifier {
   List<User> _users = [];
@@ -32,5 +33,9 @@ class HomeViewModel extends ChangeNotifier {
       _isLoading = false;
       notifyListeners();
     }
+  }
+
+  Future<void> logout(LoginViewModel loginViewModel) async {
+    await loginViewModel.logout();
   }
 }
