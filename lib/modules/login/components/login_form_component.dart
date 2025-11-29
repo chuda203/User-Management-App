@@ -3,7 +3,7 @@ import '../../../core/components/custom_text_field.dart';
 import '../../../core/components/custom_button.dart';
 
 class LoginFormComponent extends StatelessWidget {
-  final TextEditingController usernameController;
+  final TextEditingController emailController;
   final TextEditingController passwordController;
   final VoidCallback onLoginPressed;
   final bool isLoading;
@@ -11,7 +11,7 @@ class LoginFormComponent extends StatelessWidget {
 
   const LoginFormComponent({
     super.key,
-    required this.usernameController,
+    required this.emailController,
     required this.passwordController,
     required this.onLoginPressed,
     required this.isLoading,
@@ -26,12 +26,14 @@ class LoginFormComponent extends StatelessWidget {
         children: [
           CustomTextField(
             label: '',
-            hint: 'Username',
-            controller: usernameController,
+            hint: 'Email',
+            controller: emailController,
             prefixIcon: null,
             validator: (value) {
               if (value == null || value.isEmpty) {
-                return 'Please enter username';
+                return 'Please enter email';
+              } else if (!RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$').hasMatch(value)) {
+                return 'Please enter a valid email address';
               }
               return null;
             },

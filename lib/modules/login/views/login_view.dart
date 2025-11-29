@@ -12,13 +12,13 @@ class LoginView extends StatefulWidget {
 }
 
 class _LoginViewState extends State<LoginView> {
-  final TextEditingController _usernameController = TextEditingController();
+  final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
 
   @override
   void dispose() {
-    _usernameController.dispose();
+    _emailController.dispose();
     _passwordController.dispose();
     super.dispose();
   }
@@ -30,7 +30,7 @@ class _LoginViewState extends State<LoginView> {
       final loginViewModel = Provider.of<LoginViewModel>(context, listen: false);
 
       final response = await loginViewModel.loginUser(
-        _usernameController.text,
+        _emailController.text,
         _passwordController.text,
       );
 
@@ -61,7 +61,7 @@ class _LoginViewState extends State<LoginView> {
                 ),
                 const SizedBox(height: 48),
                 LoginFormComponent(
-                  usernameController: _usernameController,
+                  emailController: _emailController,
                   passwordController: _passwordController,
                   onLoginPressed: _performLogin,
                   isLoading: viewModel.isLoading,
