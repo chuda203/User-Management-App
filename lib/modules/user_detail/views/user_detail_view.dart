@@ -49,33 +49,6 @@ class _UserDetailViewState extends State<UserDetailView> {
   Widget build(BuildContext context) {
     final viewModel = context.watch<UserDetailViewModel>();
 
-    if (viewModel.isLoading) {
-      return Scaffold(
-        appBar: AppBar(
-          title: const Text('User Detail'),
-          centerTitle: true,
-        ),
-        body: const Center(
-          child: CircularProgressIndicator(),
-        ),
-      );
-    }
-
-    if (viewModel.error != null || viewModel.user == null) {
-      return Scaffold(
-        appBar: AppBar(
-          title: const Text('User Detail'),
-          centerTitle: true,
-        ),
-        body: Center(
-          child: Text(
-            viewModel.error ?? 'User not found',
-            style: const TextStyle(fontSize: 16),
-          ),
-        ),
-      );
-    }
-
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Theme.of(context).scaffoldBackgroundColor,
@@ -92,8 +65,27 @@ class _UserDetailViewState extends State<UserDetailView> {
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
-        child: SingleChildScrollView(
-          child: UserDetailCard(user: viewModel.user!),
+        child: Consumer<UserDetailViewModel>(
+          builder: (context, viewModel, child) {
+            if (viewModel.isLoading) {
+              return const Center(
+                child: CircularProgressIndicator(),
+              );
+            }
+
+            if (viewModel.error != null || viewModel.user == null) {
+              return Center(
+                child: Text(
+                  viewModel.error ?? 'User not found',
+                  style: const TextStyle(fontSize: 16),
+                ),
+              );
+            }
+
+            return SingleChildScrollView(
+              child: UserDetailCard(user: viewModel.user!),
+            );
+          },
         ),
       ),
     );
