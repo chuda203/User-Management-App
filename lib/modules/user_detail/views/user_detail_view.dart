@@ -3,8 +3,7 @@ import 'package:provider/provider.dart';
 import '../../../core/models/user.dart';
 import '../components/user_detail_card.dart';
 import '../view_models/user_detail_view_model.dart';
-import '../../user_edit/views/user_edit_view.dart';
-import '../../user_edit/view_models/user_edit_view_model.dart';
+import '../../../core/utils/route_constants.dart';
 
 class UserDetailView extends StatefulWidget {
   const UserDetailView({super.key});
@@ -49,19 +48,18 @@ class _UserDetailViewState extends State<UserDetailView> {
 
   Future<void> _editUser() async {
     if (context.read<UserDetailViewModel>().user != null) {
-      final updatedUser = await Navigator.push(
+      final result = await Navigator.pushNamed(
         context,
-        MaterialPageRoute(
-          builder: (context) => ChangeNotifierProvider.value(
-            value: Provider.of<UserEditViewModel>(context, listen: false),
-            child: UserEditView(initialUser: context.read<UserDetailViewModel>().user!),
-          ),
-        ),
+        RouteConstants.userEditRoute,
+        arguments: context.read<UserDetailViewModel>().user!,
       );
 
-      if (updatedUser != null && context.mounted) {
-        // Update the user in the view model after successful edit
-        context.read<UserDetailViewModel>().setUser(updatedUser);
+      if (result != null && context.mounted) {
+        User? updatedUser = result as User?;
+        if (updatedUser != null) {
+          // Update the user in the view model after successful edit
+          context.read<UserDetailViewModel>().setUser(updatedUser);
+        }
       }
     }
   }

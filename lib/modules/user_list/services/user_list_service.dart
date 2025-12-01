@@ -7,4 +7,8 @@ class UserListService {
   Future<List<User>> getAllUsers() async {
     return await _userService.getUsers();
   }
+
+  Future<User> createUser({String? name, String? email}) async {
+    return await _userService.createUser(name: name, email: email);
+  }
 }

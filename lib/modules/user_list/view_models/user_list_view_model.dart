@@ -31,4 +31,17 @@ class UserListViewModel extends ChangeNotifier {
     }
     notifyListeners();
   }
+
+  // Method to add a user from the service
+  Future<User> addUser({String? name, String? email}) async {
+    try {
+      final newUser = await _userListService.createUser(name: name, email: email);
+      // Add the new user to the local list
+      _allUsers.add(newUser);
+      notifyListeners();
+      return newUser;
+    } catch (e) {
+      throw Exception('Failed to add user: $e');
+    }
+  }
 }

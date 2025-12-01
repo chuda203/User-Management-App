@@ -102,6 +102,50 @@ class ApiService {
     }
   }
 
+  // Create a new user
+  Future<User> createUser({String? name, String? job, String? email}) async {
+    try {
+      final response = await http.post(
+        Uri.parse('$_baseUrl/users'),
+        headers: {
+          'Content-Type': 'application/json',
+          'x-api-key': 'reqres-free-v1',
+        },
+        body: json.encode({
+          if (name != null) 'name': name,
+          if (job != null) 'job': job,
+          if (email != null) 'email': email,
+        }),
+      );
+
+      if (response.statusCode == 201) {
+        final data = json.decode(response.body);
+        // Note: ReqRes API returns different format for create response
+        // id is returned in response for new user, but might be String
+        int userId = 0;
+        if (data['id'] != null) {
+          if (data['id'] is int) {
+            userId = data['id'];
+          } else if (data['id'] is String) {
+            userId = int.tryParse(data['id']) ?? 0;
+          }
+        }
+
+        return User(
+          id: userId,
+          name: data['name'] ?? name ?? '',
+          username: data['name']?.toLowerCase() ?? 'newuser',
+          email: data['email'] ?? email ?? '',
+          avatar: 'https://randomuser.me/api/portraits/lego/1.jpg', // Use default avatar
+        );
+      } else {
+        throw Exception('Failed to create user: ${response.statusCode}');
+      }
+    } catch (e) {
+      throw Exception('Failed to create user in API: $e');
+    }
+  }
+
   // Delete a user by ID
   Future<bool> deleteUser(int id) async {
     try {

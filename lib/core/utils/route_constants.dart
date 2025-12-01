@@ -6,4 +6,5 @@ class RouteConstants {
   static const String userListRoute = '/user-list';
   static const String userDetailRoute = '/user-detail';
   static const String userEditRoute = '/user-edit';
+  static const String userAddRoute = '/user-add';
 }

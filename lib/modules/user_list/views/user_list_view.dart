@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import '../../../core/models/user.dart';
 import '../../../core/utils/route_constants.dart';
 import '../components/user_list_tile.dart';
 import '../view_models/user_list_view_model.dart';
@@ -40,6 +41,28 @@ class _UserListViewState extends State<UserListView> {
         ),
         title: const Text('All Users'),
         titleSpacing: 0, // Reduce spacing between leading and title
+      ),
+      floatingActionButton: FloatingActionButton(
+        onPressed: () async {
+          final result = await Navigator.pushNamed(context, RouteConstants.userAddRoute);
+
+          // If a new user was added, add it directly to the local list
+          if (result != null && context.mounted) {
+            User? newUser = result as User?;
+
+            if (newUser != null) {
+              // Add the new user directly to the local list to ensure it appears immediately
+              final userListViewModel = Provider.of<UserListViewModel>(context, listen: false);
+
+              // Check if the user is already in the list to avoid duplicates
+              bool userExists = userListViewModel.allUsers.any((user) => user.id == newUser.id);
+              if (!userExists) {
+                userListViewModel.setUsers([...userListViewModel.allUsers, newUser]);
+              }
+            }
+          }
+        },
+        child: const Icon(Icons.add),
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),

@@ -1,6 +1,5 @@
 import 'dart:convert';
 import 'package:flutter/services.dart';
-import 'package:http/http.dart' as http;
 import '../models/user.dart';
 import 'api_service.dart';
 
@@ -136,6 +135,38 @@ class UserService {
       }
       // If not found in cache, throw error
       throw Exception('Failed to update user: $e');
+    }
+  }
+
+  // Create a new user
+  Future<User> createUser({String? name, String? email}) async {
+    try {
+      print('Attempting to create user via API...');
+      final newUser = await _apiService.createUser(
+        name: name,
+        email: email,
+        job: name ?? 'user', // Using 'user' as default job
+      );
+      print('Successfully created user via API');
+      // Add the new user to cache if it exists
+      if (_cachedUsers != null) {
+        _cachedUsers!.add(newUser);
+      }
+      return newUser;
+    } catch (e) {
+      print('API call for creating user failed: $e');
+      // If API fails, create a user with a fake ID for fallback
+      final fallbackUser = User(
+        id: _cachedUsers != null ? _cachedUsers!.length + 1 : 1,
+        name: name ?? 'New User',
+        username: (name ?? 'New User').toLowerCase(),
+        email: email ?? 'newuser@example.com',
+        avatar: 'https://randomuser.me/api/portraits/lego/1.jpg',
+      );
+      if (_cachedUsers != null) {
+        _cachedUsers!.add(fallbackUser);
+      }
+      return fallbackUser;
     }
   }
 
