@@ -5,4 +5,5 @@ class RouteConstants {
   static const String homeRoute = '/home';
   static const String userListRoute = '/user-list';
   static const String userDetailRoute = '/user-detail';
+  static const String userEditRoute = '/user-edit';
 }

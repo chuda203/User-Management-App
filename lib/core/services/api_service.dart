@@ -66,4 +66,61 @@ class ApiService {
       throw Exception('Failed to load user from API: $e');
     }
   }
+
+  // Update a user by ID
+  Future<User> updateUser(int id, {String? name, String? job, String? email}) async {
+    try {
+      final response = await http.put(
+        Uri.parse('$_baseUrl/users/$id'),
+        headers: {
+          'Content-Type': 'application/json',
+          'x-api-key': 'reqres-free-v1',
+        },
+        body: json.encode({
+          if (name != null) 'name': name,
+          if (job != null) 'job': job,
+          if (email != null) 'email': email,
+        }),
+      );
+
+      if (response.statusCode == 200) {
+        final data = json.decode(response.body);
+        // Note: ReqRes API returns different format for update response
+        // For demo purposes, construct a user from the response
+        return User(
+          id: id,
+          name: data['name'] ?? name ?? '',
+          username: data['updatedAt'] != null ? name?.toLowerCase() ?? 'updated' : 'updated',
+          email: data['email'] ?? email ?? '',
+          avatar: 'https://randomuser.me/api/portraits/lego/1.jpg', // Use default avatar
+        );
+      } else {
+        throw Exception('Failed to update user: ${response.statusCode}');
+      }
+    } catch (e) {
+      throw Exception('Failed to update user in API: $e');
+    }
+  }
+
+  // Delete a user by ID
+  Future<bool> deleteUser(int id) async {
+    try {
+      final response = await http.delete(
+        Uri.parse('$_baseUrl/users/$id'),
+        headers: {
+          'Content-Type': 'application/json',
+          'x-api-key': 'reqres-free-v1',
+        },
+      );
+
+      // ReqRes API returns 204 for successful deletion
+      if (response.statusCode == 204 || response.statusCode == 200) {
+        return true;
+      } else {
+        throw Exception('Failed to delete user: ${response.statusCode}');
+      }
+    } catch (e) {
+      throw Exception('Failed to delete user in API: $e');
+    }
+  }
 }

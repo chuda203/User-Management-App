@@ -3,6 +3,8 @@ import 'package:provider/provider.dart';
 import '../../../core/models/user.dart';
 import '../components/user_detail_card.dart';
 import '../view_models/user_detail_view_model.dart';
+import '../../user_edit/views/user_edit_view.dart';
+import '../../user_edit/view_models/user_edit_view_model.dart';
 
 class UserDetailView extends StatefulWidget {
   const UserDetailView({super.key});
@@ -45,6 +47,74 @@ class _UserDetailViewState extends State<UserDetailView> {
     await viewModel.loadUserDetail(userId);
   }
 
+  Future<void> _editUser() async {
+    if (context.read<UserDetailViewModel>().user != null) {
+      final updatedUser = await Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) => ChangeNotifierProvider.value(
+            value: Provider.of<UserEditViewModel>(context, listen: false),
+            child: UserEditView(initialUser: context.read<UserDetailViewModel>().user!),
+          ),
+        ),
+      );
+
+      if (updatedUser != null && context.mounted) {
+        // Update the user in the view model after successful edit
+        context.read<UserDetailViewModel>().setUser(updatedUser);
+      }
+    }
+  }
+
+  Future<void> _deleteUser() async {
+    if (context.read<UserDetailViewModel>().user != null) {
+      final confirm = await showDialog(
+        context: context,
+        builder: (context) => AlertDialog(
+          title: const Text('Delete User'),
+          content: const Text('Are you sure you want to delete this user?'),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context, false),
+              child: const Text('Cancel'),
+            ),
+            TextButton(
+              onPressed: () => Navigator.pop(context, true),
+              child: const Text('Delete'),
+            ),
+          ],
+        ),
+      );
+
+      if (confirm == true) {
+        final viewModel = context.read<UserDetailViewModel>();
+        final result = await viewModel.deleteUser(context.read<UserDetailViewModel>().user!.id);
+
+        if (result) {
+          if (context.mounted) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              const SnackBar(
+                content: Text('User deleted successfully'),
+                backgroundColor: Colors.green,
+              ),
+            );
+
+            Navigator.pop(context);
+          }
+        } else {
+          if (context.mounted) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                content: Text('Error deleting user: ${viewModel.error}'),
+                backgroundColor: Colors.red,
+              ),
+            );
+          }
+        }
+      }
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final viewModel = context.watch<UserDetailViewModel>();
@@ -62,6 +132,16 @@ class _UserDetailViewState extends State<UserDetailView> {
             Navigator.pop(context);
           },
         ),
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.edit),
+            onPressed: viewModel.isLoading ? null : _editUser,
+          ),
+          IconButton(
+            icon: const Icon(Icons.delete),
+            onPressed: viewModel.isLoading ? null : _deleteUser,
+          ),
+        ],
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),

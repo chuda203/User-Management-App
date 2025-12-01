@@ -96,6 +96,74 @@ class UserService {
     return null;
   }
 
+  // Update a user by ID
+  Future<User> updateUser(int id, {String? name, String? email}) async {
+    try {
+      print('Attempting to update user $id via API...');
+      final updatedUser = await _apiService.updateUser(
+        id,
+        name: name,
+        email: email,
+        job: name ?? 'user', // Using 'user' as default job
+      );
+      print('Successfully updated user $id via API');
+      // Update the cache if user exists
+      if (_cachedUsers != null) {
+        for (int i = 0; i < _cachedUsers!.length; i++) {
+          if (_cachedUsers![i].id == id) {
+            _cachedUsers![i] = updatedUser;
+            break;
+          }
+        }
+      }
+      return updatedUser;
+    } catch (e) {
+      print('API call for updating user $id failed: $e');
+      // Fallback to updating the cache if the API fails
+      if (_cachedUsers != null) {
+        for (int i = 0; i < _cachedUsers!.length; i++) {
+          if (_cachedUsers![i].id == id) {
+            _cachedUsers![i] = User(
+              id: id,
+              name: name ?? _cachedUsers![i].name,
+              username: (name ?? _cachedUsers![i].name).toLowerCase(),
+              email: email ?? _cachedUsers![i].email,
+              avatar: _cachedUsers![i].avatar,
+            );
+            return _cachedUsers![i];
+          }
+        }
+      }
+      // If not found in cache, throw error
+      throw Exception('Failed to update user: $e');
+    }
+  }
+
+  // Delete a user by ID
+  Future<bool> deleteUser(int id) async {
+    try {
+      print('Attempting to delete user $id via API...');
+      final result = await _apiService.deleteUser(id);
+      if (result) {
+        print('Successfully deleted user $id via API');
+        // Remove the user from cache if exists
+        if (_cachedUsers != null) {
+          _cachedUsers!.removeWhere((user) => user.id == id);
+        }
+        return true;
+      }
+      return false;
+    } catch (e) {
+      print('API call for deleting user $id failed: $e');
+      // Fallback to removing from cache if the API fails
+      if (_cachedUsers != null) {
+        _cachedUsers!.removeWhere((user) => user.id == id);
+        return true;
+      }
+      throw Exception('Failed to delete user: $e');
+    }
+  }
+
   // Clear cache if needed
   void clearCache() {
     _cachedUsers = null;
