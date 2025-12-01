@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
-import '../../../core/services/user_service.dart';
+import '../services/user_edit_service.dart';
 import '../../../core/models/user.dart';
 
 class UserEditViewModel extends ChangeNotifier {
-  final UserService _userService = UserService();
+  final UserEditService _userEditService = UserEditService();
   bool _isLoading = false;
   bool get isLoading => _isLoading;
 
@@ -16,7 +16,7 @@ class UserEditViewModel extends ChangeNotifier {
     notifyListeners();
 
     try {
-      final updatedUser = await _userService.updateUser(
+      final updatedUser = await _userEditService.updateUser(
         id,
         name: name,
         email: email,

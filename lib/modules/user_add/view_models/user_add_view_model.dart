@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
-import '../../../core/services/user_service.dart';
+import '../services/user_add_service.dart';
 import '../../../core/models/user.dart';
 
 class UserAddViewModel extends ChangeNotifier {
-  final UserService _userService = UserService();
+  final UserAddService _userAddService = UserAddService();
   bool _isLoading = false;
   bool get isLoading => _isLoading;
 
@@ -16,7 +16,7 @@ class UserAddViewModel extends ChangeNotifier {
     notifyListeners();
 
     try {
-      final newUser = await _userService.createUser(
+      final newUser = await _userAddService.createUser(
         name: name,
         email: email,
       );
