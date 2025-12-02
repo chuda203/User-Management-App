@@ -11,7 +11,7 @@ class UserService {
 
   // Cache to avoid repeated loading
   List<User>? _cachedUsers;
-  final ApiService _apiService = ApiService.instance;
+  final ApiService _apiService = ApiService();
 
   Future<List<User>> getUsers() async {
     if (_cachedUsers != null) {

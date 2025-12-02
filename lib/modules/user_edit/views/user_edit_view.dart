@@ -3,16 +3,30 @@ import 'package:provider/provider.dart';
 import '../../../core/models/user.dart';
 import '../view_models/user_edit_view_model.dart';
 
-class UserEditView extends StatefulWidget {
+class UserEditView extends StatelessWidget {
   final User initialUser;
 
   const UserEditView({super.key, required this.initialUser});
 
   @override
-  State<UserEditView> createState() => _UserEditViewState();
+  Widget build(BuildContext context) {
+    return ChangeNotifierProvider(
+      create: (_) => UserEditViewModel(),
+      child: _UserEditViewContent(initialUser: initialUser),
+    );
+  }
 }
 
-class _UserEditViewState extends State<UserEditView> {
+class _UserEditViewContent extends StatefulWidget {
+  final User initialUser;
+
+  const _UserEditViewContent({required this.initialUser});
+
+  @override
+  State<_UserEditViewContent> createState() => _UserEditViewState();
+}
+
+class _UserEditViewState extends State<_UserEditViewContent> {
   final _formKey = GlobalKey<FormState>();
   late TextEditingController _nameController;
   late TextEditingController _emailController;
@@ -50,25 +64,25 @@ class _UserEditViewState extends State<UserEditView> {
             icon: const Icon(Icons.save),
             onPressed: () async {
               if (_formKey.currentState!.validate()) {
-                final userEditViewModel = 
-                    Provider.of<UserEditViewModel>(context, listen: false);
-                
+                final userEditViewModel =
+                    context.read<UserEditViewModel>();
+
                 try {
                   await userEditViewModel.updateUser(
                     widget.initialUser.id,
                     name: _nameController.text,
                     email: _emailController.text,
                   );
-                  
+
                   if (!context.mounted) return;
-                  
+
                   ScaffoldMessenger.of(context).showSnackBar(
                     const SnackBar(
                       content: Text('User updated successfully'),
                       backgroundColor: Colors.green,
                     ),
                   );
-                  
+
                   // Pop with the updated user data
                   Navigator.pop(context, User(
                     id: widget.initialUser.id,
@@ -79,7 +93,7 @@ class _UserEditViewState extends State<UserEditView> {
                   ));
                 } catch (e) {
                   if (!context.mounted) return;
-                  
+
                   ScaffoldMessenger.of(context).showSnackBar(
                     SnackBar(
                       content: Text('Error updating user: $e'),

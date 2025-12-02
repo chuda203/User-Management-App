@@ -5,6 +5,17 @@ import '../models/user.dart';
 class ApiService {
   static const String _baseUrl = 'https://reqres.in/api';
 
+  // Singleton instance
+  static final ApiService _instance = ApiService._internal();
+
+  // Factory constructor to return the same instance
+  factory ApiService() {
+    return _instance;
+  }
+
+  // Internal constructor
+  ApiService._internal();
+
   // Common headers for API requests
   static Map<String, String> get defaultHeaders => {
     'Content-Type': 'application/json',

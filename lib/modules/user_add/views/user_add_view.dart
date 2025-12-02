@@ -2,14 +2,26 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../view_models/user_add_view_model.dart';
 
-class UserAddView extends StatefulWidget {
+class UserAddView extends StatelessWidget {
   const UserAddView({super.key});
 
   @override
-  State<UserAddView> createState() => _UserAddViewState();
+  Widget build(BuildContext context) {
+    return ChangeNotifierProvider(
+      create: (_) => UserAddViewModel(),
+      child: const _UserAddViewContent(),
+    );
+  }
 }
 
-class _UserAddViewState extends State<UserAddView> {
+class _UserAddViewContent extends StatefulWidget {
+  const _UserAddViewContent();
+
+  @override
+  State<_UserAddViewContent> createState() => _UserAddViewState();
+}
+
+class _UserAddViewState extends State<_UserAddViewContent> {
   final _formKey = GlobalKey<FormState>();
   final _nameController = TextEditingController();
   final _emailController = TextEditingController();
@@ -41,7 +53,7 @@ class _UserAddViewState extends State<UserAddView> {
             onPressed: () async {
               if (_formKey.currentState!.validate()) {
                 final userAddViewModel =
-                    Provider.of<UserAddViewModel>(context, listen: false);
+                    context.read<UserAddViewModel>();
 
                 try {
                   final newUser = await userAddViewModel.addUser(
@@ -113,7 +125,7 @@ class _UserAddViewState extends State<UserAddView> {
                 validator: (value) {
                   if (value == null || value.isEmpty) {
                     return 'Please enter an email';
-                  }
+                    }
                   if (!RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$').hasMatch(value)) {
                     return 'Please enter a valid email';
                   }
