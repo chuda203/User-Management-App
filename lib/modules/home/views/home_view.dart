@@ -3,7 +3,6 @@ import 'package:provider/provider.dart';
 import '../../../core/utils/route_constants.dart';
 import '../view_models/home_view_model.dart';
 import '../components/user_list_item.dart';
-import '../../login/view_models/login_view_model.dart';
 
 class HomeView extends StatelessWidget {
   const HomeView({super.key});
@@ -23,14 +22,14 @@ class HomeView extends StatelessWidget {
                 return IconButton(
                   icon: const Icon(Icons.logout),
                   onPressed: () async {
-                    // Get the LoginViewModel from the parent context
-                    final loginViewModel = context.read<LoginViewModel>();
-
                     // Perform the logout which clears the token
-                    await homeViewModel.logout(loginViewModel);
+                    await homeViewModel.logout();
 
                     // Navigate back to login screen
-                    Navigator.pushReplacementNamed(context, RouteConstants.loginRoute);
+                    Navigator.pushReplacementNamed(
+                      context,
+                      RouteConstants.loginRoute,
+                    );
                   },
                 );
               },

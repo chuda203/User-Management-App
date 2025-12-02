@@ -4,6 +4,11 @@ import '../models/user.dart';
 import 'api_service.dart';
 
 class UserService {
+  // Singleton instance
+  static UserService? _instance;
+  static UserService get instance => _instance ??= UserService._internal();
+  UserService._internal();
+
   // Cache to avoid repeated loading
   List<User>? _cachedUsers;
   final ApiService _apiService = ApiService();

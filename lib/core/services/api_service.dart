@@ -5,15 +5,29 @@ import '../models/user.dart';
 class ApiService {
   static const String _baseUrl = 'https://reqres.in/api';
 
+  // Singleton instance
+  static final ApiService _instance = ApiService._internal();
+
+  // Factory constructor to return the same instance
+  factory ApiService() {
+    return _instance;
+  }
+
+  // Internal constructor
+  ApiService._internal();
+
+  // Common headers for API requests
+  static Map<String, String> get defaultHeaders => {
+    'Content-Type': 'application/json',
+    'x-api-key': 'reqres_8b13e904674a414790a1d0115cd034d8',
+  };
+
   // Get all users from the external API
   Future<List<User>> getAllUsers({int page = 1}) async {
     try {
       final response = await http.get(
         Uri.parse('$_baseUrl/users?page=$page'),
-        headers: {
-          'Content-Type': 'application/json',
-          'x-api-key': 'reqres_8b13e904674a414790a1d0115cd034d8',
-        },
+        headers: defaultHeaders,
       );
 
       if (response.statusCode == 200) {
@@ -45,10 +59,7 @@ class ApiService {
     try {
       final response = await http.get(
         Uri.parse('$_baseUrl/users/$id'),
-        headers: {
-          'Content-Type': 'application/json',
-          'x-api-key': 'reqres_8b13e904674a414790a1d0115cd034d8',
-        },
+        headers: defaultHeaders,
       );
 
       if (response.statusCode == 200) {
@@ -83,10 +94,7 @@ class ApiService {
     try {
       final response = await http.put(
         Uri.parse('$_baseUrl/users/$id'),
-        headers: {
-          'Content-Type': 'application/json',
-          'x-api-key': 'reqres_8b13e904674a414790a1d0115cd034d8',
-        },
+        headers: defaultHeaders,
         body: json.encode({
           if (name != null) 'name': name,
           if (job != null) 'job': job,
@@ -121,10 +129,7 @@ class ApiService {
     try {
       final response = await http.post(
         Uri.parse('$_baseUrl/users'),
-        headers: {
-          'Content-Type': 'application/json',
-          'x-api-key': 'reqres_8b13e904674a414790a1d0115cd034d8',
-        },
+        headers: defaultHeaders,
         body: json.encode({
           if (name != null) 'name': name,
           if (job != null) 'job': job,
@@ -166,10 +171,7 @@ class ApiService {
     try {
       final response = await http.delete(
         Uri.parse('$_baseUrl/users/$id'),
-        headers: {
-          'Content-Type': 'application/json',
-          'x-api-key': 'reqres_8b13e904674a414790a1d0115cd034d8',
-        },
+        headers: defaultHeaders,
       );
 
       // ReqRes API returns 204 for successful deletion

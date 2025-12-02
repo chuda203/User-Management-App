@@ -12,7 +12,7 @@ class UserDetailViewModel extends ChangeNotifier {
   String? _error;
   String? get error => _error;
 
-  final UserDetailService _service = UserDetailService();
+  final UserDetailService _service = UserDetailService.instance;
 
   void setUser(User user) {
     _user = user;

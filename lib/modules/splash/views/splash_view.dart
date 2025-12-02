@@ -4,7 +4,6 @@ import 'package:provider/provider.dart';
 import '../../../core/utils/route_constants.dart';
 import '../view_models/splash_view_model.dart';
 import '../components/splash_component.dart';
-import '../../login/view_models/login_view_model.dart';
 
 class SplashView extends StatefulWidget {
   const SplashView({super.key});
@@ -17,32 +16,38 @@ class _SplashViewState extends State<SplashView> {
   @override
   void initState() {
     super.initState();
-    _navigateToNextScreen();
-  }
-
-  void _navigateToNextScreen() async {
-    // Simulate loading time for splash screen
-    await Future.delayed(const Duration(seconds: 2));
-
-    // Check if user has valid token
-    LoginViewModel loginViewModel = context.read<LoginViewModel>();
-    bool hasValidToken = await loginViewModel.hasValidToken();
-
-    // Navigate based on authentication status
-    if (hasValidToken) {
-      // User is authenticated, go to home screen
-      Navigator.of(context).pushReplacementNamed(RouteConstants.homeRoute);
-    } else {
-      // User is not authenticated, go to login screen
-      Navigator.of(context).pushReplacementNamed(RouteConstants.loginRoute);
-    }
   }
 
   @override
   Widget build(BuildContext context) {
     return ChangeNotifierProvider(
       create: (_) => SplashViewModel(),
-      child: const SplashComponent(),
+      child: Consumer<SplashViewModel>(
+        builder: (context, splashViewModel, child) {
+          // Using WidgetsBinding.instance.addPostFrameCallback to execute after the widget is built
+          WidgetsBinding.instance.addPostFrameCallback((_) {
+            // Simulate loading time for splash screen
+            Future.delayed(const Duration(seconds: 2)).then((_) async {
+              // Check authentication status using SplashViewModel
+              final hasValidToken = await splashViewModel.checkAuthentication();
+
+              // Ensure context is still valid before navigation
+              if (!mounted) return;
+
+              // Navigate based on authentication status
+              if (hasValidToken) {
+                // User is authenticated, go to home screen
+                Navigator.of(context).pushReplacementNamed(RouteConstants.homeRoute);
+              } else {
+                // User is not authenticated, go to login screen
+                Navigator.of(context).pushReplacementNamed(RouteConstants.loginRoute);
+              }
+            });
+          });
+
+          return const SplashComponent();
+        },
+      ),
     );
   }
 }

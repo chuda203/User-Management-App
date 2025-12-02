@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import '../../../core/models/user.dart';
 import '../services/home_service.dart';
-import '../../login/view_models/login_view_model.dart';
+import '../../../core/services/auth_storage_service.dart';
 
 class HomeViewModel extends ChangeNotifier {
   List<User> _users = [];
@@ -10,7 +10,7 @@ class HomeViewModel extends ChangeNotifier {
   bool _isLoading = false;
   bool get isLoading => _isLoading;
 
-  final HomeService _homeService = HomeService();
+  final HomeService _homeService = HomeService.instance;
 
   void initializeUsers() async {
     _isLoading = true;
@@ -35,7 +35,7 @@ class HomeViewModel extends ChangeNotifier {
     }
   }
 
-  Future<void> logout(LoginViewModel loginViewModel) async {
-    await loginViewModel.logout();
+  Future<void> logout() async {
+    await AuthStorageService.removeToken();
   }
 }

@@ -6,6 +6,11 @@ import '../../../core/services/auth_storage_service.dart';
 class LoginApiService {
   static const String _baseUrl = 'https://reqres.in/api/login';
 
+  // Singleton instance
+  static LoginApiService? _instance;
+  static LoginApiService get instance => _instance ??= LoginApiService._internal();
+  LoginApiService._internal();
+
   Future<LoginResponse> login(String email, String password) async {
     try {
       final response = await http.post(
