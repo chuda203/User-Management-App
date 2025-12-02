@@ -6,7 +6,7 @@ class UserListViewModel extends ChangeNotifier {
   List<User> _allUsers = [];
   List<User> get allUsers => _allUsers;
 
-  final UserListService _userListService = UserListService();
+  final UserListService _userListService = UserListService.instance;
 
   void setUsers(List<User> users) {
     _allUsers = users;

@@ -2,7 +2,12 @@ import '../../../core/services/user_service.dart';
 import '../../../core/models/user.dart';
 
 class HomeService {
-  final UserService _userService = UserService();
+  // Singleton instance
+  static HomeService? _instance;
+  static HomeService get instance => _instance ??= HomeService._internal();
+  HomeService._internal();
+
+  final UserService _userService = UserService.instance;
 
   Future<List<User>> getRecentUsers() async {
     // Get all users and return just the first 3 for the home screen

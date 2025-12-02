@@ -3,7 +3,7 @@ import '../services/user_add_service.dart';
 import '../../../core/models/user.dart';
 
 class UserAddViewModel extends ChangeNotifier {
-  final UserAddService _userAddService = UserAddService();
+  final UserAddService _userAddService = UserAddService.instance;
   bool _isLoading = false;
   bool get isLoading => _isLoading;
 

@@ -3,7 +3,7 @@ import '../models/login_response.dart';
 import '../services/login_api_service.dart';
 
 class LoginViewModel extends ChangeNotifier {
-  final LoginApiService _loginService = LoginApiService();
+  final LoginApiService _loginService = LoginApiService.instance;
 
   bool _isLoading = false;
   bool get isLoading => _isLoading;

@@ -3,7 +3,7 @@ import '../services/user_edit_service.dart';
 import '../../../core/models/user.dart';
 
 class UserEditViewModel extends ChangeNotifier {
-  final UserEditService _userEditService = UserEditService();
+  final UserEditService _userEditService = UserEditService.instance;
   bool _isLoading = false;
   bool get isLoading => _isLoading;
 
