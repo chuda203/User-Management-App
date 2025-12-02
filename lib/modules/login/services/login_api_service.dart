@@ -12,7 +12,7 @@ class LoginApiService {
         Uri.parse(_baseUrl),
         headers: <String, String>{
           'Content-Type': 'application/json; charset=UTF-8',
-          'X-API-Key': 'reqres-free-v1',
+          'X-API-Key': 'reqres_8b13e904674a414790a1d0115cd034d8',
         },
         body: jsonEncode(<String, String>{
           'email': email,

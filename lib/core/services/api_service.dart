@@ -12,7 +12,7 @@ class ApiService {
         Uri.parse('$_baseUrl/users?page=$page'),
         headers: {
           'Content-Type': 'application/json',
-          'x-api-key': 'reqres-free-v1',
+          'x-api-key': 'reqres_8b13e904674a414790a1d0115cd034d8',
         },
       );
 
@@ -20,13 +20,18 @@ class ApiService {
         final data = json.decode(response.body);
         final usersData = data['data'] as List;
 
-        return usersData.map((userData) => User(
-          id: userData['id'] as int,
-          name: '${userData['first_name'] as String} ${userData['last_name'] as String}',
-          username: (userData['first_name'] as String).toLowerCase(),
-          email: userData['email'] as String,
-          avatar: userData['avatar'] as String,
-        )).toList();
+        return usersData
+            .map(
+              (userData) => User(
+                id: userData['id'] as int,
+                name:
+                    '${userData['first_name'] as String} ${userData['last_name'] as String}',
+                username: (userData['first_name'] as String).toLowerCase(),
+                email: userData['email'] as String,
+                avatar: userData['avatar'] as String,
+              ),
+            )
+            .toList();
       } else {
         throw Exception('Failed to load users: ${response.statusCode}');
       }
@@ -42,7 +47,7 @@ class ApiService {
         Uri.parse('$_baseUrl/users/$id'),
         headers: {
           'Content-Type': 'application/json',
-          'x-api-key': 'reqres-free-v1',
+          'x-api-key': 'reqres_8b13e904674a414790a1d0115cd034d8',
         },
       );
 
@@ -52,7 +57,8 @@ class ApiService {
 
         return User(
           id: userData['id'] as int,
-          name: '${userData['first_name'] as String} ${userData['last_name'] as String}',
+          name:
+              '${userData['first_name'] as String} ${userData['last_name'] as String}',
           username: (userData['first_name'] as String).toLowerCase(),
           email: userData['email'] as String,
           avatar: userData['avatar'] as String,
@@ -68,13 +74,18 @@ class ApiService {
   }
 
   // Update a user by ID
-  Future<User> updateUser(int id, {String? name, String? job, String? email}) async {
+  Future<User> updateUser(
+    int id, {
+    String? name,
+    String? job,
+    String? email,
+  }) async {
     try {
       final response = await http.put(
         Uri.parse('$_baseUrl/users/$id'),
         headers: {
           'Content-Type': 'application/json',
-          'x-api-key': 'reqres-free-v1',
+          'x-api-key': 'reqres_8b13e904674a414790a1d0115cd034d8',
         },
         body: json.encode({
           if (name != null) 'name': name,
@@ -90,9 +101,12 @@ class ApiService {
         return User(
           id: id,
           name: data['name'] ?? name ?? '',
-          username: data['updatedAt'] != null ? name?.toLowerCase() ?? 'updated' : 'updated',
+          username: data['updatedAt'] != null
+              ? name?.toLowerCase() ?? 'updated'
+              : 'updated',
           email: data['email'] ?? email ?? '',
-          avatar: 'https://randomuser.me/api/portraits/lego/1.jpg', // Use default avatar
+          avatar:
+              'https://randomuser.me/api/portraits/lego/1.jpg', // Use default avatar
         );
       } else {
         throw Exception('Failed to update user: ${response.statusCode}');
@@ -109,7 +123,7 @@ class ApiService {
         Uri.parse('$_baseUrl/users'),
         headers: {
           'Content-Type': 'application/json',
-          'x-api-key': 'reqres-free-v1',
+          'x-api-key': 'reqres_8b13e904674a414790a1d0115cd034d8',
         },
         body: json.encode({
           if (name != null) 'name': name,
@@ -136,7 +150,8 @@ class ApiService {
           name: data['name'] ?? name ?? '',
           username: data['name']?.toLowerCase() ?? 'newuser',
           email: data['email'] ?? email ?? '',
-          avatar: 'https://randomuser.me/api/portraits/lego/1.jpg', // Use default avatar
+          avatar:
+              'https://randomuser.me/api/portraits/lego/1.jpg', // Use default avatar
         );
       } else {
         throw Exception('Failed to create user: ${response.statusCode}');
@@ -153,7 +168,7 @@ class ApiService {
         Uri.parse('$_baseUrl/users/$id'),
         headers: {
           'Content-Type': 'application/json',
-          'x-api-key': 'reqres-free-v1',
+          'x-api-key': 'reqres_8b13e904674a414790a1d0115cd034d8',
         },
       );
 
