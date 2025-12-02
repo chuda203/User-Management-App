@@ -5,14 +5,26 @@ import '../components/user_detail_card.dart';
 import '../view_models/user_detail_view_model.dart';
 import '../../../core/utils/route_constants.dart';
 
-class UserDetailView extends StatefulWidget {
+class UserDetailView extends StatelessWidget {
   const UserDetailView({super.key});
 
   @override
-  State<UserDetailView> createState() => _UserDetailViewState();
+  Widget build(BuildContext context) {
+    return ChangeNotifierProvider(
+      create: (_) => UserDetailViewModel(),
+      child: const _UserDetailViewContent(),
+    );
+  }
 }
 
-class _UserDetailViewState extends State<UserDetailView> {
+class _UserDetailViewContent extends StatefulWidget {
+  const _UserDetailViewContent();
+
+  @override
+  State<_UserDetailViewContent> createState() => _UserDetailViewState();
+}
+
+class _UserDetailViewState extends State<_UserDetailViewContent> {
   @override
   void initState() {
     super.initState();

@@ -5,23 +5,32 @@ import '../../../core/utils/route_constants.dart';
 import '../components/user_list_tile.dart';
 import '../view_models/user_list_view_model.dart';
 
-class UserListView extends StatefulWidget {
+class UserListView extends StatelessWidget {
   const UserListView({super.key});
 
   @override
-  State<UserListView> createState() => _UserListViewState();
+  Widget build(BuildContext context) {
+    return ChangeNotifierProvider(
+      create: (_) => UserListViewModel(),
+      child: const _UserListViewContent(),
+    );
+  }
 }
 
-class _UserListViewState extends State<UserListView> {
+class _UserListViewContent extends StatefulWidget {
+  const _UserListViewContent();
+
+  @override
+  State<_UserListViewContent> createState() => _UserListViewState();
+}
+
+class _UserListViewState extends State<_UserListViewContent> {
   @override
   void initState() {
     super.initState();
     // Initialize the user list from the service
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      final userListViewModel = Provider.of<UserListViewModel>(
-        context,
-        listen: false,
-      );
+      final userListViewModel = context.read<UserListViewModel>();
       userListViewModel.initializeUsers();
     });
   }
@@ -52,7 +61,7 @@ class _UserListViewState extends State<UserListView> {
 
             if (newUser != null) {
               // Add the new user directly to the local list to ensure it appears immediately
-              final userListViewModel = Provider.of<UserListViewModel>(context, listen: false);
+              final userListViewModel = context.read<UserListViewModel>();
 
               // Check if the user is already in the list to avoid duplicates
               bool userExists = userListViewModel.allUsers.any((user) => user.id == newUser.id);
