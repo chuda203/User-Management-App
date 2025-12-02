@@ -10,7 +10,7 @@ class HomeViewModel extends ChangeNotifier {
   bool _isLoading = false;
   bool get isLoading => _isLoading;
 
-  final HomeService _homeService = HomeService();
+  final HomeService _homeService = HomeService.instance;
 
   void initializeUsers() async {
     _isLoading = true;
