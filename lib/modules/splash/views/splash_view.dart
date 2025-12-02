@@ -4,7 +4,6 @@ import 'package:provider/provider.dart';
 import '../../../core/utils/route_constants.dart';
 import '../view_models/splash_view_model.dart';
 import '../components/splash_component.dart';
-import '../../login/view_models/login_view_model.dart';
 
 class SplashView extends StatefulWidget {
   const SplashView({super.key});
@@ -24,9 +23,12 @@ class _SplashViewState extends State<SplashView> {
     // Simulate loading time for splash screen
     await Future.delayed(const Duration(seconds: 2));
 
-    // Check if user has valid token
-    LoginViewModel loginViewModel = context.read<LoginViewModel>();
-    bool hasValidToken = await loginViewModel.hasValidToken();
+    // Check authentication status using SplashViewModel
+    final splashViewModel = context.read<SplashViewModel>();
+    final hasValidToken = await splashViewModel.checkAuthentication();
+
+    // Ensure context is still valid before navigation
+    if (!mounted) return;
 
     // Navigate based on authentication status
     if (hasValidToken) {
