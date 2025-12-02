@@ -16,7 +16,6 @@ class HomeService {
         name: recentUsers[i].name,
         username: recentUsers[i].username,
         email: recentUsers[i].email,
-        // Use numbered avatars for home screen (like 1, 2, 3) with purple background
         avatar: 'https://ui-avatars.com/api/?name=${i+1}&background=800080&color=fff&size=128',
       );
     }

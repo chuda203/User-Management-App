@@ -40,6 +40,27 @@ class UserDetailViewModel extends ChangeNotifier {
     }
   }
 
+  Future<bool> deleteUser(int userId) async {
+    _isLoading = true;
+    _error = null;
+    notifyListeners();
+
+    try {
+      final result = await _service.deleteUser(userId);
+      if (result) {
+        _user = null;
+        _error = null;
+      }
+      return result;
+    } catch (e) {
+      _error = 'Failed to delete user: ${e.toString()}';
+      return false;
+    } finally {
+      _isLoading = false;
+      notifyListeners();
+    }
+  }
+
   void clearState() {
     _user = null;
     _error = null;

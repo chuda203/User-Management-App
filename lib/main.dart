@@ -3,15 +3,20 @@ import 'package:provider/provider.dart';
 import 'core/styles/theme.dart';
 import 'core/utils/constants.dart';
 import 'core/utils/route_constants.dart';
+import 'core/models/user.dart';
 import 'modules/login/views/login_view.dart';
 import 'modules/home/views/home_view.dart';
 import 'modules/user_list/views/user_list_view.dart';
 import 'modules/user_detail/views/user_detail_view.dart';
+import 'modules/user_add/views/user_add_view.dart';
+import 'modules/user_edit/views/user_edit_view.dart';
 import 'modules/splash/views/splash_view.dart';
 import 'modules/login/view_models/login_view_model.dart';
 import 'modules/home/view_models/home_view_model.dart';
 import 'modules/user_list/view_models/user_list_view_model.dart';
 import 'modules/user_detail/view_models/user_detail_view_model.dart';
+import 'modules/user_add/view_models/user_add_view_model.dart';
+import 'modules/user_edit/view_models/user_edit_view_model.dart';
 import 'modules/splash/view_models/splash_view_model.dart';
 
 void main() {
@@ -29,6 +34,8 @@ class MyApp extends StatelessWidget {
         ChangeNotifierProvider(create: (_) => HomeViewModel()),
         ChangeNotifierProvider(create: (_) => UserListViewModel()),
         ChangeNotifierProvider(create: (_) => UserDetailViewModel()),
+        ChangeNotifierProvider(create: (_) => UserAddViewModel()),
+        ChangeNotifierProvider(create: (_) => UserEditViewModel()),
         ChangeNotifierProvider(create: (_) => SplashViewModel()),
       ],
       child: MaterialApp(
@@ -42,6 +49,8 @@ class MyApp extends StatelessWidget {
           RouteConstants.homeRoute: (context) => const HomeView(),
           RouteConstants.userListRoute: (context) => const UserListView(),
           RouteConstants.userDetailRoute: (context) => const UserDetailView(),
+          RouteConstants.userAddRoute: (context) => const UserAddView(),
+          RouteConstants.userEditRoute: (context) => UserEditView(initialUser: ModalRoute.of(context)?.settings.arguments as User),
         },
       ),
     );

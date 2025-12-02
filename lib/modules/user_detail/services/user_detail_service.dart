@@ -7,4 +7,8 @@ class UserDetailService {
   Future<User?> getUserById(int id) async {
     return await _userService.getUserById(id);
   }
+
+  Future<bool> deleteUser(int id) async {
+    return await _userService.deleteUser(id);
+  }
 }
