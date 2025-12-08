@@ -28,13 +28,15 @@ class _UserDetailViewState extends State<_UserDetailViewContent> {
   @override
   void initState() {
     super.initState();
-    // Use WidgetsBinding to ensure the widget is fully initialized before calling async operations
-    WidgetsBinding.instance.addPostFrameCallback((_) async {
-      await _loadUserDetail();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _loadUserDetail();
     });
   }
 
   Future<void> _loadUserDetail() async {
+    // Check if widget is still mounted before proceeding
+    if (!mounted) return;
+
     final viewModel = context.read<UserDetailViewModel>();
 
     final args = ModalRoute.of(context)?.settings.arguments;
@@ -54,21 +56,30 @@ class _UserDetailViewState extends State<_UserDetailViewContent> {
       return;
     }
 
+    // Check if context is still mounted after getting arguments
+    if (!mounted) return;
+
     // Load the user detail using the ViewModel
     await viewModel.loadUserDetail(userId);
+
+    // Check if context is still mounted after async operation
+    if (!mounted) return;
   }
 
   Future<void> _editUser() async {
-    if (context.read<UserDetailViewModel>().user != null) {
+    final user = context.read<UserDetailViewModel>().user;
+    if (user != null) {
       final result = await Navigator.pushNamed(
         context,
         RouteConstants.userEditRoute,
-        arguments: context.read<UserDetailViewModel>().user!,
+        arguments: user,
       );
 
-      if (result != null && context.mounted) {
+      if (!mounted) return; // Check if context is still valid after async operation
+
+      if (result != null) {
         User? updatedUser = result as User?;
-        if (updatedUser != null) {
+        if (updatedUser != null && mounted) { // Additional mounted check
           // Update the user in the view model after successful edit
           context.read<UserDetailViewModel>().setUser(updatedUser);
         }
@@ -77,7 +88,10 @@ class _UserDetailViewState extends State<_UserDetailViewContent> {
   }
 
   Future<void> _deleteUser() async {
-    if (context.read<UserDetailViewModel>().user != null) {
+    final userDetailViewModel = context.read<UserDetailViewModel>();
+    final user = userDetailViewModel.user;
+
+    if (user != null) {
       final confirm = await showDialog(
         context: context,
         builder: (context) => AlertDialog(
@@ -96,12 +110,15 @@ class _UserDetailViewState extends State<_UserDetailViewContent> {
         ),
       );
 
+      if (!mounted) return; // Check if context is still valid after async operation
+
       if (confirm == true) {
-        final viewModel = context.read<UserDetailViewModel>();
-        final result = await viewModel.deleteUser(context.read<UserDetailViewModel>().user!.id);
+        final result = await userDetailViewModel.deleteUser(user.id);
+
+        if (!mounted) return; // Check again after another async operation
 
         if (result) {
-          if (context.mounted) {
+          if (mounted) {
             ScaffoldMessenger.of(context).showSnackBar(
               const SnackBar(
                 content: Text('User deleted successfully'),
@@ -112,10 +129,10 @@ class _UserDetailViewState extends State<_UserDetailViewContent> {
             Navigator.pop(context);
           }
         } else {
-          if (context.mounted) {
+          if (mounted) {
             ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(
-                content: Text('Error deleting user: ${viewModel.error}'),
+                content: Text('Error deleting user: ${userDetailViewModel.error}'),
                 backgroundColor: Colors.red,
               ),
             );
