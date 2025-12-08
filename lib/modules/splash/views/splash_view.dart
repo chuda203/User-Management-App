@@ -13,41 +13,48 @@ class SplashView extends StatefulWidget {
 }
 
 class _SplashViewState extends State<SplashView> {
+  late SplashViewModel _splashViewModel;
+
   @override
   void initState() {
     super.initState();
+    _splashViewModel = SplashViewModel();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _startSplashSequence();
+    });
+  }
+
+  Future<void> _startSplashSequence() async {
+    // Check if widget is still mounted before proceeding
+    if (!mounted) return;
+
+    // Simulate loading time for splash screen
+    await Future.delayed(const Duration(seconds: 2));
+
+    // Check if widget is still mounted after delay
+    if (!mounted) return;
+
+    // Check authentication status using the stored viewModel
+    final hasValidToken = await _splashViewModel.checkAuthentication();
+
+    // Ensure context is still valid before navigation
+    if (!mounted) return;
+
+    // Navigate based on authentication status
+    if (hasValidToken) {
+      // User is authenticated, go to home screen
+      Navigator.of(context).pushReplacementNamed(RouteConstants.homeRoute);
+    } else {
+      // User is not authenticated, go to login screen
+      Navigator.of(context).pushReplacementNamed(RouteConstants.loginRoute);
+    }
   }
 
   @override
   Widget build(BuildContext context) {
-    return ChangeNotifierProvider(
-      create: (_) => SplashViewModel(),
-      child: Consumer<SplashViewModel>(
-        builder: (context, splashViewModel, child) {
-          // Using WidgetsBinding.instance.addPostFrameCallback to execute after the widget is built
-          WidgetsBinding.instance.addPostFrameCallback((_) {
-            // Simulate loading time for splash screen
-            Future.delayed(const Duration(seconds: 2)).then((_) async {
-              // Check authentication status using SplashViewModel
-              final hasValidToken = await splashViewModel.checkAuthentication();
-
-              // Ensure context is still valid before navigation
-              if (!mounted) return;
-
-              // Navigate based on authentication status
-              if (hasValidToken) {
-                // User is authenticated, go to home screen
-                Navigator.of(context).pushReplacementNamed(RouteConstants.homeRoute);
-              } else {
-                // User is not authenticated, go to login screen
-                Navigator.of(context).pushReplacementNamed(RouteConstants.loginRoute);
-              }
-            });
-          });
-
-          return const SplashComponent();
-        },
-      ),
+    return ChangeNotifierProvider.value(
+      value: _splashViewModel,
+      child: const SplashComponent(),
     );
   }
 }

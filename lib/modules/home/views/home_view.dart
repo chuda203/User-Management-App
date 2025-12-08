@@ -4,8 +4,26 @@ import '../../../core/utils/route_constants.dart';
 import '../view_models/home_view_model.dart';
 import '../components/user_list_item.dart';
 
-class HomeView extends StatelessWidget {
+class HomeView extends StatefulWidget {
   const HomeView({super.key});
+
+  @override
+  State<HomeView> createState() => _HomeViewState();
+}
+
+class _HomeViewState extends State<HomeView> {
+  Future<void> _performLogout(HomeViewModel homeViewModel) async {
+    // Perform the logout which clears the token
+    await homeViewModel.logout();
+
+    // Check if context is still mounted before navigation
+    if (!mounted) return;
+
+    Navigator.pushReplacementNamed(
+      context,
+      RouteConstants.loginRoute,
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -21,15 +39,8 @@ class HomeView extends StatelessWidget {
               builder: (context, homeViewModel, child) {
                 return IconButton(
                   icon: const Icon(Icons.logout),
-                  onPressed: () async {
-                    // Perform the logout which clears the token
-                    await homeViewModel.logout();
-
-                    // Navigate back to login screen
-                    Navigator.pushReplacementNamed(
-                      context,
-                      RouteConstants.loginRoute,
-                    );
+                  onPressed: () {
+                    _performLogout(homeViewModel);
                   },
                 );
               },
