@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'core/services/api_service.dart';
 import 'core/styles/theme.dart';
 import 'core/utils/constants.dart';
 import 'core/utils/route_constants.dart';
@@ -13,7 +14,9 @@ import 'modules/user_edit/views/user_edit_view.dart';
 import 'modules/splash/views/splash_view.dart';
 import 'modules/login/view_models/login_view_model.dart';
 
-void main() {
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await ApiService.initialize(); // Initialize environment variables
   runApp(
     MultiProvider(
       providers: [

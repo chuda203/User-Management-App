@@ -1,4 +1,6 @@
 import 'dart:convert';
+import 'package:flutter/services.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:http/http.dart' as http;
 import '../models/user.dart';
 
@@ -16,11 +18,29 @@ class ApiService {
   // Internal constructor
   ApiService._internal();
 
+  // Initialize dotenv
+  static Future<void> initialize() async {
+    try {
+      await dotenv.load(fileName: ".env");
+    } catch (e) {
+      // If .env file is not found, continue without it
+      // This handles cases where the file doesn't exist in assets
+      // but we still want the app to run normally
+    }
+  }
+
   // Common headers for API requests
-  static Map<String, String> get defaultHeaders => {
-    'Content-Type': 'application/json',
-    'x-api-key': 'reqres_8b13e904674a414790a1d0115cd034d8',
-  };
+  static Map<String, String> get defaultHeaders {
+    Map<String, String> headers = {'Content-Type': 'application/json'};
+
+    // Add API key to headers if it exists in the environment
+    String? apiKey = dotenv.env['REQRES_API_KEY'];
+    if (apiKey != null && apiKey.isNotEmpty) {
+      headers['x-api-key'] = apiKey;
+    }
+
+    return headers;
+  }
 
   // Get all users from the external API
   Future<List<User>> getAllUsers({int page = 1}) async {
