@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
 import '../models/user.dart';
 import 'api_service.dart';
@@ -21,13 +22,13 @@ class UserService {
 
     try {
       // Try to fetch from API first
-      print('Attempting to fetch users from API...');
+      debugPrint('[INFO] Attempting to fetch users from API...');
       final users = await _apiService.getAllUsers();
-      print('Successfully fetched ${users.length} users from API');
+      debugPrint('[INFO] Successfully fetched ${users.length} users from API');
       _cachedUsers = users;
       return users;
     } catch (e) {
-      print('API call failed: $e. Falling back to local JSON.');
+      debugPrint('[WARNING] API call failed: $e. Falling back to local JSON.');
       // Fallback to local JSON file if API fails
       try {
         final String response = await rootBundle.loadString('lib/core/data/users.json');
@@ -35,12 +36,12 @@ class UserService {
 
         final users = userList.map((json) => User.fromJson(json)).toList();
 
-        print('Successfully loaded ${users.length} users from local JSON');
+        debugPrint('[INFO] Successfully loaded ${users.length} users from local JSON');
         // Cache the users for future use
         _cachedUsers = users;
         return users;
       } catch (jsonError) {
-        print('Local JSON loading failed: $jsonError');
+        debugPrint('[ERROR] Local JSON loading failed: $jsonError');
         // Return sample data in case of error
         final fallbackUsers = [
           User(
@@ -67,14 +68,14 @@ class UserService {
   Future<User?> getUserById(int id) async {
     try {
       // Try to fetch from API first
-      print('Attempting to fetch user $id from API...');
+      debugPrint('[INFO] Attempting to fetch user $id from API...');
       final user = await _apiService.getUserById(id);
       if (user != null) {
-        print('Successfully fetched user $id from API');
+        debugPrint('[INFO] Successfully fetched user $id from API');
         return user;
       }
     } catch (e) {
-      print('API call for user $id failed: $e');
+      debugPrint('[WARNING] API call for user $id failed: $e');
       // If API fails, look in cached users
     }
 
@@ -103,14 +104,14 @@ class UserService {
   // Update a user by ID
   Future<User> updateUser(int id, {String? name, String? email}) async {
     try {
-      print('Attempting to update user $id via API...');
+      debugPrint('[INFO] Attempting to update user $id via API...');
       final updatedUser = await _apiService.updateUser(
         id,
         name: name,
         email: email,
         job: name ?? 'user', // Using 'user' as default job
       );
-      print('Successfully updated user $id via API');
+      debugPrint('[INFO] Successfully updated user $id via API');
       // Update the cache if user exists
       if (_cachedUsers != null) {
         for (int i = 0; i < _cachedUsers!.length; i++) {
@@ -122,7 +123,7 @@ class UserService {
       }
       return updatedUser;
     } catch (e) {
-      print('API call for updating user $id failed: $e');
+      debugPrint('[WARNING] API call for updating user $id failed: $e');
       // Fallback to updating the cache if the API fails
       if (_cachedUsers != null) {
         for (int i = 0; i < _cachedUsers!.length; i++) {
@@ -146,20 +147,20 @@ class UserService {
   // Create a new user
   Future<User> createUser({String? name, String? email}) async {
     try {
-      print('Attempting to create user via API...');
+      debugPrint('[INFO] Attempting to create user via API...');
       final newUser = await _apiService.createUser(
         name: name,
         email: email,
         job: name ?? 'user', // Using 'user' as default job
       );
-      print('Successfully created user via API');
+      debugPrint('[INFO] Successfully created user via API');
       // Add the new user to cache if it exists
       if (_cachedUsers != null) {
         _cachedUsers!.add(newUser);
       }
       return newUser;
     } catch (e) {
-      print('API call for creating user failed: $e');
+      debugPrint('[WARNING] API call for creating user failed: $e');
       // If API fails, create a user with a fake ID for fallback
       final fallbackUser = User(
         id: _cachedUsers != null ? _cachedUsers!.length + 1 : 1,
@@ -178,10 +179,10 @@ class UserService {
   // Delete a user by ID
   Future<bool> deleteUser(int id) async {
     try {
-      print('Attempting to delete user $id via API...');
+      debugPrint('[INFO] Attempting to delete user $id via API...');
       final result = await _apiService.deleteUser(id);
       if (result) {
-        print('Successfully deleted user $id via API');
+        debugPrint('[INFO] Successfully deleted user $id via API');
         // Remove the user from cache if exists
         if (_cachedUsers != null) {
           _cachedUsers!.removeWhere((user) => user.id == id);
@@ -190,7 +191,7 @@ class UserService {
       }
       return false;
     } catch (e) {
-      print('API call for deleting user $id failed: $e');
+      debugPrint('[WARNING] API call for deleting user $id failed: $e');
       // Fallback to removing from cache if the API fails
       if (_cachedUsers != null) {
         _cachedUsers!.removeWhere((user) => user.id == id);
