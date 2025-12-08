@@ -118,25 +118,21 @@ class _UserDetailViewState extends State<_UserDetailViewContent> {
         if (!mounted) return; // Check again after another async operation
 
         if (result) {
-          if (mounted) {
-            ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(
-                content: Text('User deleted successfully'),
-                backgroundColor: Colors.green,
-              ),
-            );
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text('User deleted successfully'),
+              backgroundColor: Colors.green,
+            ),
+          );
 
-            Navigator.pop(context);
-          }
+          Navigator.pop(context);
         } else {
-          if (mounted) {
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(
-                content: Text('Error deleting user: ${userDetailViewModel.error}'),
-                backgroundColor: Colors.red,
-              ),
-            );
-          }
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text('Error deleting user: ${userDetailViewModel.error}'),
+              backgroundColor: Colors.red,
+            ),
+          );
         }
       }
     }

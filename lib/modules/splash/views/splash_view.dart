@@ -43,14 +43,10 @@ class _SplashViewState extends State<SplashView> {
     // Navigate based on authentication status
     if (hasValidToken) {
       // User is authenticated, go to home screen
-      if (mounted) {
-        Navigator.of(context).pushReplacementNamed(RouteConstants.homeRoute);
-      }
+      Navigator.of(context).pushReplacementNamed(RouteConstants.homeRoute);
     } else {
       // User is not authenticated, go to login screen
-      if (mounted) {
-        Navigator.of(context).pushReplacementNamed(RouteConstants.loginRoute);
-      }
+      Navigator.of(context).pushReplacementNamed(RouteConstants.loginRoute);
     }
   }
 

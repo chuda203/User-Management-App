@@ -19,13 +19,10 @@ class _HomeViewState extends State<HomeView> {
     // Check if context is still mounted before navigation
     if (!mounted) return;
 
-    // Use the mounted context for navigation
-    if (mounted) {
-      Navigator.pushReplacementNamed(
-        context,
-        RouteConstants.loginRoute,
-      );
-    }
+    Navigator.pushReplacementNamed(
+      context,
+      RouteConstants.loginRoute,
+    );
   }
 
   @override
