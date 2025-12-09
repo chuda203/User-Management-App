@@ -16,4 +16,8 @@ class UserListService {
   Future<User> createUser({String? name, String? email}) async {
     return await _userService.userRepository.createUser(name: name, email: email);
   }
+
+  Future<void> syncIfOnline() async {
+    await _userService.syncService.syncIfOnline();
+  }
 }
