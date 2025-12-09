@@ -10,6 +10,6 @@ class UserEditService {
   final UserService _userService = UserService.instance;
 
   Future<User> updateUser(int id, {String? name, String? email}) async {
-    return await _userService.updateUser(id, name: name, email: email);
+    return await _userService.userRepository.updateUser(id, name: name, email: email);
   }
 }
