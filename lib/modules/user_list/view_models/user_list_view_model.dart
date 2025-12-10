@@ -1,22 +1,31 @@
 import 'package:flutter/material.dart';
 import '../../../core/models/user.dart';
-import '../services/user_list_service.dart';
+import '../../../core/repository/user_repository.dart';
+import '../../../core/services/local_user_service.dart';
+import '../../../core/services/remote_user_service.dart';
+import '../../../core/services/sync_service.dart';
 
 class UserListViewModel extends ChangeNotifier {
   List<User> _allUsers = [];
   List<User> get allUsers => _allUsers;
 
-  final UserListService _userListService = UserListService.instance;
+  final UserRepository _userRepository;
+
+  UserListViewModel()
+      : _userRepository = UserRepositoryImpl(
+          localDataSource: LocalUserServiceImpl(),
+          remoteDataSource: RemoteUserServiceImpl(),
+        );
 
   void setUsers(List<User> users) {
     _allUsers = users;
     notifyListeners();
   }
 
-  // Method to fetch all users from the service
+  // Method to fetch all users directly from the repository
   void initializeUsers() async {
     try {
-      _allUsers = await _userListService.getAllUsers();
+      _allUsers = await _userRepository.getAllUsers();
     } catch (e) {
       // Set default users in case of error
       _allUsers = [
@@ -32,10 +41,10 @@ class UserListViewModel extends ChangeNotifier {
     notifyListeners();
   }
 
-  // Method to add a user from the service
+  // Method to add a user directly through the repository
   Future<User> addUser({String? name, String? email}) async {
     try {
-      final newUser = await _userListService.createUser(name: name, email: email);
+      final newUser = await _userRepository.createUser(name: name, email: email);
       // Add the new user to the local list
       _allUsers.add(newUser);
       notifyListeners();
@@ -43,5 +52,12 @@ class UserListViewModel extends ChangeNotifier {
     } catch (e) {
       throw Exception('Failed to add user: $e');
     }
+  }
+
+  // Method to sync data if online
+  Future<void> syncIfOnline() async {
+    // Create a sync service with the same repository instance
+    final syncService = SyncService(userRepository: _userRepository);
+    await syncService.syncIfOnline();
   }
 }

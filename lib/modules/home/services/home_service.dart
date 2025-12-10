@@ -1,17 +1,27 @@
-import '../../../core/services/user_service.dart';
 import '../../../core/models/user.dart';
+import '../../../core/repository/user_repository.dart';
+import '../../../core/services/local_user_service.dart';
+import '../../../core/services/remote_user_service.dart';
 
-class HomeService {
-  // Singleton instance
-  static HomeService? _instance;
-  static HomeService get instance => _instance ??= HomeService._internal();
-  HomeService._internal();
+abstract class HomeService {
+  Future<List<User>> getRecentUsers();
+}
 
-  final UserService _userService = UserService.instance;
+class HomeServiceImpl implements HomeService {
+  final UserRepository _userRepository;
 
+  HomeServiceImpl({
+    UserRepository? userRepository,
+  }) : _userRepository = userRepository ?? 
+        UserRepositoryImpl(
+          localDataSource: LocalUserServiceImpl(),
+          remoteDataSource: RemoteUserServiceImpl(),
+        );
+
+  @override
   Future<List<User>> getRecentUsers() async {
     // Get all users and return just the first 3 for the home screen
-    final allUsers = await _userService.userRepository.getAllUsers();
+    final allUsers = await _userRepository.getAllUsers();
     final recentUsers = allUsers.take(3).toList();
 
     // Modify the avatars to show numbered placeholders for home screen only
