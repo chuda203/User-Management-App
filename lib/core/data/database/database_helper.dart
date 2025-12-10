@@ -1,4 +1,3 @@
-import 'dart:io';
 import 'package:path/path.dart';
 import 'package:sqflite/sqflite.dart';
 import 'package:first_task/core/models/user.dart';
@@ -96,7 +95,7 @@ class DatabaseHelper {
   Future<void> insertAllUsers(List<User> users) async {
     final db = await database;
     final batch = db.batch();
-    
+
     for (final user in users) {
       batch.insert(
         'users',
@@ -104,7 +103,7 @@ class DatabaseHelper {
         conflictAlgorithm: ConflictAlgorithm.replace,
       );
     }
-    
+
     await batch.commit();
   }
 
