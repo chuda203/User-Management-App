@@ -1,6 +1,6 @@
 import 'package:flutter/foundation.dart';
-import 'package:first_task/core/data/local/local_user_data_source.dart';
-import 'package:first_task/core/data/remote/remote_user_data_source.dart';
+import 'package:first_task/core/services/local_user_service.dart';
+import 'package:first_task/core/services/remote_user_service.dart';
 import 'package:first_task/core/models/user.dart';
 
 abstract class UserRepository {
@@ -14,12 +14,12 @@ abstract class UserRepository {
 }
 
 class UserRepositoryImpl implements UserRepository {
-  final LocalUserDataSource _localDataSource;
-  final RemoteUserDataSource _remoteDataSource;
+  final LocalUserService _localDataSource;
+  final RemoteUserService _remoteDataSource;
 
   UserRepositoryImpl({
-    required LocalUserDataSource localDataSource,
-    required RemoteUserDataSource remoteDataSource,
+    required LocalUserService localDataSource,
+    required RemoteUserService remoteDataSource,
   })  : _localDataSource = localDataSource,
         _remoteDataSource = remoteDataSource;
 

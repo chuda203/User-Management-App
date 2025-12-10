@@ -1,5 +1,5 @@
-import 'package:first_task/core/data/local/local_user_data_source.dart';
-import 'package:first_task/core/data/remote/remote_user_data_source.dart';
+import 'package:first_task/core/services/local_user_service.dart';
+import 'package:first_task/core/services/remote_user_service.dart';
 import 'package:first_task/core/repository/user_repository.dart';
 import 'package:first_task/core/services/sync_service.dart';
 import 'package:first_task/core/services/connectivity_service.dart';
@@ -18,8 +18,8 @@ class UserService {
 
   UserService._internal()
       : _userRepository = UserRepositoryImpl(
-          localDataSource: LocalUserDataSourceImpl(),
-          remoteDataSource: RemoteUserDataSourceImpl(),
+          localDataSource: LocalUserServiceImpl(),
+          remoteDataSource: RemoteUserServiceImpl(),
         ) {
     _syncService = SyncService(userRepository: _userRepository);
     _connectivityService = ConnectivityService(userService: this);

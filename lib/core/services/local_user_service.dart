@@ -1,7 +1,7 @@
-import 'package:first_task/core/data/database/database_helper.dart';
+import 'package:first_task/core/database/database_helper.dart';
 import 'package:first_task/core/models/user.dart';
 
-abstract class LocalUserDataSource {
+abstract class LocalUserService {
   Future<List<User>> getAllUsers();
   Future<User?> getUserById(int id);
   Future<void> insertUser(User user);
@@ -11,7 +11,7 @@ abstract class LocalUserDataSource {
   Future<void> clearUsers();
 }
 
-class LocalUserDataSourceImpl implements LocalUserDataSource {
+class LocalUserServiceImpl implements LocalUserService {
   final DatabaseHelper _databaseHelper = DatabaseHelper();
 
   @override
