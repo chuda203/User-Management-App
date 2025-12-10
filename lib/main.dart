@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'core/services/api_service.dart';
+import 'core/services/user_service.dart';
 import 'core/styles/theme.dart';
 import 'core/utils/constants.dart';
 import 'core/utils/route_constants.dart';

@@ -2,33 +2,18 @@ import 'dart:convert';
 import 'package:flutter/services.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:http/http.dart' as http;
-import '../models/user.dart';
-import '../data/remote/remote_user_data_source.dart';
+import 'package:first_task/core/models/user.dart';
 
-class ApiService {
+abstract class RemoteUserDataSource {
+  Future<List<User>> getAllUsers({int page});
+  Future<User?> getUserById(int id);
+  Future<User> updateUser(int id, {String? name, String? job, String? email});
+  Future<User> createUser({String? name, String? job, String? email});
+  Future<bool> deleteUser(int id);
+}
+
+class RemoteUserDataSourceImpl implements RemoteUserDataSource {
   static const String _baseUrl = 'https://reqres.in/api';
-
-  // Singleton instance
-  static final ApiService _instance = ApiService._internal();
-
-  // Factory constructor to return the same instance
-  factory ApiService() {
-    return _instance;
-  }
-
-  // Internal constructor
-  ApiService._internal();
-
-  // Initialize dotenv
-  static Future<void> initialize() async {
-    try {
-      await dotenv.load(fileName: ".env");
-    } catch (e) {
-      // If .env file is not found, continue without it
-      // This handles cases where the file doesn't exist in assets
-      // but we still want the app to run normally
-    }
-  }
 
   // Common headers for API requests
   static Map<String, String> get defaultHeaders {
@@ -43,7 +28,7 @@ class ApiService {
     return headers;
   }
 
-  // Get all users from the external API
+  @override
   Future<List<User>> getAllUsers({int page = 1}) async {
     try {
       final response = await http.get(
@@ -75,7 +60,7 @@ class ApiService {
     }
   }
 
-  // Get a single user by ID from the external API
+  @override
   Future<User?> getUserById(int id) async {
     try {
       final response = await http.get(
@@ -105,7 +90,7 @@ class ApiService {
     }
   }
 
-  // Update a user by ID
+  @override
   Future<User> updateUser(
     int id, {
     String? name,
@@ -130,9 +115,7 @@ class ApiService {
         return User(
           id: id,
           name: data['name'] ?? name ?? '',
-          username: data['updatedAt'] != null
-              ? name?.toLowerCase() ?? 'updated'
-              : 'updated',
+          username: name?.toLowerCase() ?? 'updated',
           email: data['email'] ?? email ?? '',
           avatar:
               'https://randomuser.me/api/portraits/lego/1.jpg', // Use default avatar
@@ -145,7 +128,7 @@ class ApiService {
     }
   }
 
-  // Create a new user
+  @override
   Future<User> createUser({String? name, String? job, String? email}) async {
     try {
       final response = await http.post(
@@ -187,7 +170,7 @@ class ApiService {
     }
   }
 
-  // Delete a user by ID
+  @override
   Future<bool> deleteUser(int id) async {
     try {
       final response = await http.delete(

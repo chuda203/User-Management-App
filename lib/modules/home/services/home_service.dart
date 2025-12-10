@@ -11,7 +11,7 @@ class HomeService {
 
   Future<List<User>> getRecentUsers() async {
     // Get all users and return just the first 3 for the home screen
-    final allUsers = await _userService.getUsers();
+    final allUsers = await _userService.userRepository.getAllUsers();
     final recentUsers = allUsers.take(3).toList();
 
     // Modify the avatars to show numbered placeholders for home screen only

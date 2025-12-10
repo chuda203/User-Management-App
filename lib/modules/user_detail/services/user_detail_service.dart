@@ -10,10 +10,10 @@ class UserDetailService {
   final UserService _userService = UserService.instance;
 
   Future<User?> getUserById(int id) async {
-    return await _userService.getUserById(id);
+    return await _userService.userRepository.getUserById(id);
   }
 
   Future<bool> deleteUser(int id) async {
-    return await _userService.deleteUser(id);
+    return await _userService.userRepository.deleteUser(id);
   }
 }
