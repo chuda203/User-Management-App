@@ -1,9 +1,7 @@
 import 'dart:convert';
-import 'package:flutter/services.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:http/http.dart' as http;
 import '../models/user.dart';
-import '../data/remote/remote_user_data_source.dart';
 
 class ApiService {
   static const String _baseUrl = 'https://reqres.in/api';
