@@ -25,6 +25,8 @@ class _UserDetailViewContent extends StatefulWidget {
 }
 
 class _UserDetailViewState extends State<_UserDetailViewContent> {
+  bool _isDeleteInitiated = false;
+
   @override
   void initState() {
     super.initState();
@@ -69,20 +71,21 @@ class _UserDetailViewState extends State<_UserDetailViewContent> {
   Future<void> _editUser() async {
     final user = context.read<UserDetailViewModel>().user;
     if (user != null) {
-      final result = await Navigator.pushNamed(
+      await Navigator.pushNamed(
         context,
         RouteConstants.userEditRoute,
         arguments: user,
       );
 
-      if (!mounted) return; // Check if context is still valid after async operation
+      // Refresh the data after coming back from edit
+      if (mounted) {
+        // Check if context is still valid after async operation
+        // Reload the user details to reflect the changes
+        await context.read<UserDetailViewModel>().loadUserDetail(user.id);
 
-      if (result != null) {
-        User? updatedUser = result as User?;
-        if (updatedUser != null && mounted) { // Additional mounted check
-          // Update the user in the view model after successful edit
-          context.read<UserDetailViewModel>().setUser(updatedUser);
-        }
+        // If this user detail was accessed from user list screen,
+        // trigger a refresh on the user list screen
+        // For now, just reload the current user details
       }
     }
   }
@@ -110,9 +113,15 @@ class _UserDetailViewState extends State<_UserDetailViewContent> {
         ),
       );
 
-      if (!mounted) return; // Check if context is still valid after async operation
+      if (!mounted) {
+        return; // Check if context is still valid after async operation
+      }
 
       if (confirm == true) {
+        setState(() {
+          _isDeleteInitiated = true;
+        });
+
         final result = await userDetailViewModel.deleteUser(user.id);
 
         if (!mounted) return; // Check again after another async operation
@@ -125,11 +134,17 @@ class _UserDetailViewState extends State<_UserDetailViewContent> {
             ),
           );
 
+          // Pop immediately after successful deletion to avoid showing "User not found"
           Navigator.pop(context);
         } else {
+          setState(() {
+            _isDeleteInitiated = false;
+          });
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
-              content: Text('Error deleting user: ${userDetailViewModel.error}'),
+              content: Text(
+                'Error deleting user: ${userDetailViewModel.error}',
+              ),
               backgroundColor: Colors.red,
             ),
           );
@@ -141,6 +156,27 @@ class _UserDetailViewState extends State<_UserDetailViewContent> {
   @override
   Widget build(BuildContext context) {
     final viewModel = context.watch<UserDetailViewModel>();
+
+    // If delete was initiated, show a message instead of the content
+    if (_isDeleteInitiated) {
+      return Scaffold(
+        appBar: AppBar(
+          backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+          foregroundColor: Colors.black,
+          elevation: 0,
+        ),
+        body: const Center(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              CircularProgressIndicator(),
+              SizedBox(height: 16),
+              Text('Deleting user...'),
+            ],
+          ),
+        ),
+      );
+    }
 
     return Scaffold(
       appBar: AppBar(
@@ -171,9 +207,7 @@ class _UserDetailViewState extends State<_UserDetailViewContent> {
         child: Consumer<UserDetailViewModel>(
           builder: (context, viewModel, child) {
             if (viewModel.isLoading) {
-              return const Center(
-                child: CircularProgressIndicator(),
-              );
+              return const Center(child: CircularProgressIndicator());
             }
 
             if (viewModel.error != null || viewModel.user == null) {

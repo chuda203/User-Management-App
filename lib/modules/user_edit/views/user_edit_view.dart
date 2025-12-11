@@ -83,14 +83,8 @@ class _UserEditViewState extends State<_UserEditViewContent> {
                     ),
                   );
 
-                  // Pop with the updated user data
-                  Navigator.pop(context, User(
-                    id: widget.initialUser.id,
-                    name: _nameController.text,
-                    username: _nameController.text.toLowerCase(),
-                    email: _emailController.text,
-                    avatar: widget.initialUser.avatar,
-                  ));
+                  // Pop the edit screen and let the parent screen handle refresh
+                  Navigator.pop(context);
                 } catch (e) {
                   if (!context.mounted) return;
 

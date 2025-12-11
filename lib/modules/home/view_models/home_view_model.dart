@@ -21,7 +21,7 @@ class HomeViewModel extends ChangeNotifier {
             remoteDataSource: RemoteUserServiceImpl(),
           );
 
-  void initializeUsers() async {
+  Future<void> initializeUsers() async {
     _isLoading = true;
     notifyListeners();
 

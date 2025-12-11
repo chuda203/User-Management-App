@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import '../../../core/models/user.dart';
 import '../../../core/utils/route_constants.dart';
 import '../components/user_list_tile.dart';
 import '../view_models/user_list_view_model.dart';
@@ -24,15 +23,35 @@ class _UserListViewContent extends StatefulWidget {
   State<_UserListViewContent> createState() => _UserListViewState();
 }
 
-class _UserListViewState extends State<_UserListViewContent> {
+class _UserListViewState extends State<_UserListViewContent> with WidgetsBindingObserver {
   @override
   void initState() {
     super.initState();
+    WidgetsBinding.instance.addObserver(this);
     // Initialize the user list from the service
     WidgetsBinding.instance.addPostFrameCallback((_) {
       final userListViewModel = context.read<UserListViewModel>();
       userListViewModel.initializeUsers();
     });
+  }
+
+  @override
+  void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
+    super.dispose();
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    super.didChangeAppLifecycleState(state);
+
+    if (state == AppLifecycleState.resumed) {
+      // Refresh the user list when the app resumes
+      if (mounted) {
+        final userListViewModel = context.read<UserListViewModel>();
+        userListViewModel.refreshUsers();
+      }
+    }
   }
 
   @override
@@ -45,6 +64,9 @@ class _UserListViewState extends State<_UserListViewContent> {
         leading: IconButton(
           icon: const Icon(Icons.arrow_back),
           onPressed: () {
+            // Refresh data when navigating away
+            final userListViewModel = context.read<UserListViewModel>();
+            userListViewModel.refreshUsers();
             Navigator.pop(context);
           },
         ),
@@ -53,22 +75,12 @@ class _UserListViewState extends State<_UserListViewContent> {
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: () async {
-          final result = await Navigator.pushNamed(context, RouteConstants.userAddRoute);
+          await Navigator.pushNamed(context, RouteConstants.userAddRoute);
 
-          // If a new user was added, add it directly to the local list
-          if (result != null && context.mounted) {
-            User? newUser = result as User?;
-
-            if (newUser != null) {
-              // Add the new user directly to the local list to ensure it appears immediately
-              final userListViewModel = context.read<UserListViewModel>();
-
-              // Check if the user is already in the list to avoid duplicates
-              bool userExists = userListViewModel.allUsers.any((user) => user.id == newUser.id);
-              if (!userExists) {
-                userListViewModel.setUsers([...userListViewModel.allUsers, newUser]);
-              }
-            }
+          // Refresh the list to ensure it's up to date after the operation
+          if (context.mounted) {
+            final userListViewModel = context.read<UserListViewModel>();
+            await userListViewModel.refreshUsers();
           }
         },
         child: const Icon(Icons.add),
@@ -90,8 +102,8 @@ class _UserListViewState extends State<_UserListViewContent> {
                       final user = viewModel.allUsers[index];
                       return UserListTile(
                         user: user,
-                        onTap: () {
-                          Navigator.pushNamed(
+                        onTap: () async {
+                          await Navigator.pushNamed(
                             context,
                             RouteConstants.userDetailRoute,
                             arguments: {
@@ -99,6 +111,12 @@ class _UserListViewState extends State<_UserListViewContent> {
                               'fromHome': false,
                             }, // Mark as NOT coming from home
                           );
+
+                          // Refresh the list after returning from detail view
+                          if (context.mounted) {
+                            final userListViewModel = context.read<UserListViewModel>();
+                            await userListViewModel.refreshUsers();
+                          }
                         },
                       );
                     },

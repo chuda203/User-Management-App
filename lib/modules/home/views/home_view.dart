@@ -96,11 +96,17 @@ class _HomeViewState extends State<HomeView> {
                         SizedBox(
                           width: double.infinity,
                           child: ElevatedButton(
-                            onPressed: () {
-                              Navigator.pushNamed(
+                            onPressed: () async {
+                              await Navigator.pushNamed(
                                 context,
                                 RouteConstants.userListRoute,
                               );
+
+                              // Refresh the home screen data after returning from user list
+                              if (context.mounted) {
+                                final homeViewModel = context.read<HomeViewModel>();
+                                await homeViewModel.initializeUsers();
+                              }
                             },
                             style: ElevatedButton.styleFrom(
                               backgroundColor: Theme.of(context).primaryColor,
