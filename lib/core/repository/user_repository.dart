@@ -85,13 +85,17 @@ class UserRepositoryImpl implements UserRepository {
   @override
   Future<User> updateUser(int id, {String? name, String? job, String? email}) async {
     try {
-      // Try to update in local database first
+      // First get the existing user to preserve the avatar
+      final existingUser = await _localDataSource.getUserById(id);
+      final String originalAvatar = existingUser?.avatar ?? 'https://randomuser.me/api/portraits/lego/1.jpg';
+
+      // Create a user object with the preserved avatar for local update
       final user = User(
         id: id,
-        name: name ?? '',
-        username: name?.toLowerCase() ?? 'updated',
-        email: email ?? '',
-        avatar: 'https://randomuser.me/api/portraits/lego/1.jpg',
+        name: name ?? existingUser?.name ?? '',
+        username: (name ?? existingUser?.name)?.toLowerCase() ?? 'updated',
+        email: email ?? existingUser?.email ?? '',
+        avatar: originalAvatar,
       );
 
       await _localDataSource.updateUser(user);
@@ -106,10 +110,19 @@ class UserRepositoryImpl implements UserRepository {
         );
         debugPrint('[INFO] Successfully updated user ${id} on remote API');
 
-        // Sync back to local database in case the remote response has different data
-        await _localDataSource.insertUser(updatedUser);
+        // Preserve original avatar in the updated user before saving to local database
+        final finalUser = User(
+          id: updatedUser.id,
+          name: updatedUser.name,
+          username: updatedUser.username,
+          email: updatedUser.email,
+          avatar: originalAvatar, // Keep the original avatar
+        );
 
-        return updatedUser;
+        // Sync back to local database with preserved avatar
+        await _localDataSource.insertUser(finalUser);
+
+        return finalUser;
       } catch (remoteError) {
         debugPrint('[WARN] Failed to update user ${id} on remote API: $remoteError. Keeping local changes.');
         // Return local user with the changes
