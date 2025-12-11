@@ -13,11 +13,12 @@ class UserListViewModel extends ChangeNotifier {
   final UserRepository _userRepository;
   final UserService _userService;
 
-  UserListViewModel()
-      : _userRepository = UserRepositoryImpl(
-          localDataSource: LocalUserServiceImpl(),
-          remoteDataSource: RemoteUserServiceImpl(),
-        ),
+  UserListViewModel({UserRepository? userRepository})
+      : _userRepository = userRepository ??
+          UserRepositoryImpl(
+            localDataSource: LocalUserServiceImpl(),
+            remoteDataSource: RemoteUserServiceImpl(),
+          ),
         _userService = UserService.instance {
     // Set up connectivity change callback for sync
     _userService.connectivityService.setOnConnectivityChangedCallback(_handleConnectivityChange);
@@ -43,7 +44,7 @@ class UserListViewModel extends ChangeNotifier {
   }
 
   // Method to fetch all users directly from the repository
-  void initializeUsers() async {
+  Future<void> initializeUsers() async {
     try {
       _allUsers = await _userRepository.getAllUsers();
     } catch (e) {
@@ -61,16 +62,50 @@ class UserListViewModel extends ChangeNotifier {
     notifyListeners();
   }
 
+  // Method to refresh users from the repository
+  Future<void> refreshUsers() async {
+    try {
+      final updatedUsers = await _userRepository.getAllUsers();
+      _allUsers = updatedUsers;
+    } catch (e) {
+      // On error, just keep the current users
+    }
+    notifyListeners();
+  }
+
   // Method to add a user directly through the repository
   Future<User> addUser({String? name, String? email}) async {
     try {
       final newUser = await _userRepository.createUser(name: name, email: email);
-      // Add the new user to the local list
-      _allUsers.add(newUser);
-      notifyListeners();
+      // Refresh the list to ensure consistency
+      await refreshUsers();
       return newUser;
     } catch (e) {
       throw Exception('Failed to add user: $e');
+    }
+  }
+
+  // Method to update a user directly through the repository
+  Future<User> updateUser(int id, {String? name, String? email}) async {
+    try {
+      final updatedUser = await _userRepository.updateUser(id, name: name, email: email);
+      // Refresh the list to ensure consistency
+      await refreshUsers();
+      return updatedUser;
+    } catch (e) {
+      throw Exception('Failed to update user: $e');
+    }
+  }
+
+  // Method to delete a user directly through the repository
+  Future<bool> deleteUser(int id) async {
+    try {
+      final result = await _userRepository.deleteUser(id);
+      // Refresh the list to ensure consistency
+      await refreshUsers();
+      return result;
+    } catch (e) {
+      throw Exception('Failed to delete user: $e');
     }
   }
 
