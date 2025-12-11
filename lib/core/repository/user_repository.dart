@@ -135,8 +135,9 @@ class UserRepositoryImpl implements UserRepository {
       avatar: 'https://randomuser.me/api/portraits/lego/1.jpg',
     );
 
-    // Insert the temporary user into local database immediately
+    // Insert the temporary user into local database immediately for instant response
     await _localDataSource.insertUser(tempUser);
+    debugPrint('[INFO] User created offline with temporary ID: $tempId');
 
     try {
       // Try to create in remote API
@@ -196,16 +197,38 @@ class UserRepositoryImpl implements UserRepository {
 
   @override
   Future<void> syncPendingOperations() async {
-    // This method should only sync the actual pending operations
-    // For now, we'll just log that we're attempting to sync changes
     debugPrint('[INFO] Starting sync of pending operations (create/update/delete)...');
 
-    // In a more advanced implementation, you would:
-    // 1. Check for any temporary IDs (negative IDs) in the local database and try to create them remotely
-    // 2. Track which users were modified but failed to sync previously
-    // 3. Try to sync these changes in the order they occurred
+    try {
+      // Check for users with negative IDs (temporary IDs for offline users)
+      final allUsers = await _localDataSource.getAllUsers();
+      final offlineUsers = allUsers.where((user) => user.id < 0).toList();
 
-    // For now, we don't do a full sync that would overwrite offline changes
-    // The individual operations (create/update/delete) already attempt to sync themselves
+      // Try to sync each offline user
+      for (final user in offlineUsers) {
+        try {
+          debugPrint('[INFO] Attempting to sync offline user: ${user.name} with temporary ID: ${user.id}');
+
+          // Try to create the user on remote
+          final newUser = await _remoteDataSource.createUser(
+            name: user.name,
+            email: user.email,
+          );
+
+          // Update the local database with the actual server ID
+          await _localDataSource.deleteUser(user.id); // Remove the temp user
+          await _localDataSource.insertUser(newUser); // Insert with real ID
+
+          debugPrint('[INFO] Successfully synced offline user to server with ID: ${newUser.id}');
+        } catch (e) {
+          debugPrint('[WARN] Failed to sync offline user ${user.name} (temp ID: ${user.id}): $e. Will retry later.');
+          // Continue to next user even if one fails
+        }
+      }
+
+      debugPrint('[INFO] Pending operations sync completed');
+    } catch (e) {
+      debugPrint('[ERROR] Error during sync of pending operations: $e');
+    }
   }
 }

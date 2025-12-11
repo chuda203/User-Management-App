@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import '../../../core/models/user.dart';
-import '../services/user_detail_service.dart';
+import '../../../core/repository/user_repository.dart';
+import '../../../core/services/local_user_service.dart';
+import '../../../core/services/remote_user_service.dart';
 
 class UserDetailViewModel extends ChangeNotifier {
   User? _user;
@@ -12,7 +14,13 @@ class UserDetailViewModel extends ChangeNotifier {
   String? _error;
   String? get error => _error;
 
-  final UserDetailService _service = UserDetailService.instance;
+  final UserRepository _userRepository;
+
+  UserDetailViewModel()
+      : _userRepository = UserRepositoryImpl(
+          localDataSource: LocalUserServiceImpl(),
+          remoteDataSource: RemoteUserServiceImpl(),
+        );
 
   void setUser(User user) {
     _user = user;
@@ -26,7 +34,7 @@ class UserDetailViewModel extends ChangeNotifier {
     notifyListeners();
 
     try {
-      final user = await _service.getUserById(userId);
+      final user = await _userRepository.getUserById(userId);
       if (user != null) {
         _user = user;
       } else {
@@ -46,7 +54,7 @@ class UserDetailViewModel extends ChangeNotifier {
     notifyListeners();
 
     try {
-      final result = await _service.deleteUser(userId);
+      final result = await _userRepository.deleteUser(userId);
       if (result) {
         _user = null;
         _error = null;

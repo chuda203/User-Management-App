@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
 import '../models/login_response.dart';
-import '../services/login_api_service.dart';
+import '../../../core/repository/auth_repository.dart';
 
 class LoginViewModel extends ChangeNotifier {
-  final LoginApiService _loginService = LoginApiService.instance;
+  final AuthRepository _authRepository;
+
+  LoginViewModel() : _authRepository = AuthRepositoryImpl();
 
   bool _isLoading = false;
   bool get isLoading => _isLoading;
@@ -16,7 +18,13 @@ class LoginViewModel extends ChangeNotifier {
     _setErrorMessage(null);
 
     try {
-      final response = await _loginService.login(email, password);
+      final result = await _authRepository.login(email, password);
+      final response = LoginResponse(
+        token: result['token'] ?? '',
+        success: result['success'] ?? false,
+        message: result['message'] ?? '',
+      );
+
       if (response.success) {
         _setErrorMessage(null);
       } else {
@@ -50,14 +58,14 @@ class LoginViewModel extends ChangeNotifier {
   }
 
   Future<void> logout() async {
-    await _loginService.logout();
+    await _authRepository.logout();
   }
 
   Future<String?> getSavedToken() async {
-    return await _loginService.getSavedToken();
+    return await _authRepository.getSavedToken();
   }
 
   Future<bool> hasValidToken() async {
-    return await _loginService.hasValidToken();
+    return await _authRepository.hasValidToken();
   }
 }

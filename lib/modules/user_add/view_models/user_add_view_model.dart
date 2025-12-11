@@ -1,9 +1,18 @@
 import 'package:flutter/material.dart';
-import '../services/user_add_service.dart';
 import '../../../core/models/user.dart';
+import '../../../core/repository/user_repository.dart';
+import '../../../core/services/local_user_service.dart';
+import '../../../core/services/remote_user_service.dart';
 
 class UserAddViewModel extends ChangeNotifier {
-  final UserAddService _userAddService = UserAddService.instance;
+  final UserRepository _userRepository;
+
+  UserAddViewModel()
+      : _userRepository = UserRepositoryImpl(
+          localDataSource: LocalUserServiceImpl(),
+          remoteDataSource: RemoteUserServiceImpl(),
+        );
+
   bool _isLoading = false;
   bool get isLoading => _isLoading;
 
@@ -16,7 +25,7 @@ class UserAddViewModel extends ChangeNotifier {
     notifyListeners();
 
     try {
-      final newUser = await _userAddService.createUser(
+      final newUser = await _userRepository.createUser(
         name: name,
         email: email,
       );

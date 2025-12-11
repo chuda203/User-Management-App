@@ -1,9 +1,18 @@
 import 'package:flutter/material.dart';
-import '../services/user_edit_service.dart';
 import '../../../core/models/user.dart';
+import '../../../core/repository/user_repository.dart';
+import '../../../core/services/local_user_service.dart';
+import '../../../core/services/remote_user_service.dart';
 
 class UserEditViewModel extends ChangeNotifier {
-  final UserEditService _userEditService = UserEditService.instance;
+  final UserRepository _userRepository;
+
+  UserEditViewModel()
+      : _userRepository = UserRepositoryImpl(
+          localDataSource: LocalUserServiceImpl(),
+          remoteDataSource: RemoteUserServiceImpl(),
+        );
+
   bool _isLoading = false;
   bool get isLoading => _isLoading;
 
@@ -16,7 +25,7 @@ class UserEditViewModel extends ChangeNotifier {
     notifyListeners();
 
     try {
-      final updatedUser = await _userEditService.updateUser(
+      final updatedUser = await _userRepository.updateUser(
         id,
         name: name,
         email: email,
