@@ -1,10 +1,12 @@
 import 'dart:convert';
+import 'dart:async';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:http/http.dart' as http;
 import '../models/user.dart';
 
 class ApiService {
   static const String _baseUrl = 'https://reqres.in/api';
+  static const Duration _timeout = Duration(seconds: 2);
 
   // Singleton instance
   static final ApiService _instance = ApiService._internal();
@@ -41,13 +43,20 @@ class ApiService {
     return headers;
   }
 
+  // Helper method to make HTTP requests with timeout
+  Future<http.Response> _makeRequest(
+    Future<http.Response> Function() requestFn,
+  ) async {
+    return await requestFn().timeout(_timeout);
+  }
+
   // Get all users from the external API
   Future<List<User>> getAllUsers({int page = 1}) async {
     try {
-      final response = await http.get(
+      final response = await _makeRequest(() => http.get(
         Uri.parse('$_baseUrl/users?page=$page'),
         headers: defaultHeaders,
-      );
+      ));
 
       if (response.statusCode == 200) {
         final data = json.decode(response.body);
@@ -76,10 +85,10 @@ class ApiService {
   // Get a single user by ID from the external API
   Future<User?> getUserById(int id) async {
     try {
-      final response = await http.get(
+      final response = await _makeRequest(() => http.get(
         Uri.parse('$_baseUrl/users/$id'),
         headers: defaultHeaders,
-      );
+      ));
 
       if (response.statusCode == 200) {
         final data = json.decode(response.body);
@@ -111,7 +120,7 @@ class ApiService {
     String? email,
   }) async {
     try {
-      final response = await http.put(
+      final response = await _makeRequest(() => http.put(
         Uri.parse('$_baseUrl/users/$id'),
         headers: defaultHeaders,
         body: json.encode({
@@ -119,7 +128,7 @@ class ApiService {
           if (job != null) 'job': job,
           if (email != null) 'email': email,
         }),
-      );
+      ));
 
       if (response.statusCode == 200) {
         final data = json.decode(response.body);
@@ -146,7 +155,7 @@ class ApiService {
   // Create a new user
   Future<User> createUser({String? name, String? job, String? email}) async {
     try {
-      final response = await http.post(
+      final response = await _makeRequest(() => http.post(
         Uri.parse('$_baseUrl/users'),
         headers: defaultHeaders,
         body: json.encode({
@@ -154,7 +163,7 @@ class ApiService {
           if (job != null) 'job': job,
           if (email != null) 'email': email,
         }),
-      );
+      ));
 
       if (response.statusCode == 201) {
         final data = json.decode(response.body);
@@ -188,10 +197,10 @@ class ApiService {
   // Delete a user by ID
   Future<bool> deleteUser(int id) async {
     try {
-      final response = await http.delete(
+      final response = await _makeRequest(() => http.delete(
         Uri.parse('$_baseUrl/users/$id'),
         headers: defaultHeaders,
-      );
+      ));
 
       // ReqRes API returns 204 for successful deletion
       if (response.statusCode == 204 || response.statusCode == 200) {

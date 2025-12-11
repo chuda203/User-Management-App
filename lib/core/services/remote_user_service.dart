@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:async';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:http/http.dart' as http;
 import 'package:first_task/core/models/user.dart';
@@ -13,6 +14,7 @@ abstract class RemoteUserService {
 
 class RemoteUserServiceImpl implements RemoteUserService {
   static const String _baseUrl = 'https://reqres.in/api';
+  static const Duration _timeout = Duration(seconds: 2);
 
   // Common headers for API requests
   static Map<String, String> get defaultHeaders {
@@ -27,13 +29,20 @@ class RemoteUserServiceImpl implements RemoteUserService {
     return headers;
   }
 
+  // Helper method to make HTTP requests with timeout
+  Future<http.Response> _makeRequest(
+    Future<http.Response> Function() requestFn,
+  ) async {
+    return await requestFn().timeout(_timeout);
+  }
+
   @override
   Future<List<User>> getAllUsers({int page = 1}) async {
     try {
-      final response = await http.get(
+      final response = await _makeRequest(() => http.get(
         Uri.parse('$_baseUrl/users?page=$page'),
         headers: defaultHeaders,
-      );
+      ));
 
       if (response.statusCode == 200) {
         final data = json.decode(response.body);
@@ -62,10 +71,10 @@ class RemoteUserServiceImpl implements RemoteUserService {
   @override
   Future<User?> getUserById(int id) async {
     try {
-      final response = await http.get(
+      final response = await _makeRequest(() => http.get(
         Uri.parse('$_baseUrl/users/$id'),
         headers: defaultHeaders,
-      );
+      ));
 
       if (response.statusCode == 200) {
         final data = json.decode(response.body);
@@ -97,7 +106,7 @@ class RemoteUserServiceImpl implements RemoteUserService {
     String? email,
   }) async {
     try {
-      final response = await http.put(
+      final response = await _makeRequest(() => http.put(
         Uri.parse('$_baseUrl/users/$id'),
         headers: defaultHeaders,
         body: json.encode({
@@ -105,7 +114,7 @@ class RemoteUserServiceImpl implements RemoteUserService {
           if (job != null) 'job': job,
           if (email != null) 'email': email,
         }),
-      );
+      ));
 
       if (response.statusCode == 200) {
         final data = json.decode(response.body);
@@ -130,7 +139,7 @@ class RemoteUserServiceImpl implements RemoteUserService {
   @override
   Future<User> createUser({String? name, String? job, String? email}) async {
     try {
-      final response = await http.post(
+      final response = await _makeRequest(() => http.post(
         Uri.parse('$_baseUrl/users'),
         headers: defaultHeaders,
         body: json.encode({
@@ -138,7 +147,7 @@ class RemoteUserServiceImpl implements RemoteUserService {
           if (job != null) 'job': job,
           if (email != null) 'email': email,
         }),
-      );
+      ));
 
       if (response.statusCode == 201) {
         final data = json.decode(response.body);
@@ -172,10 +181,10 @@ class RemoteUserServiceImpl implements RemoteUserService {
   @override
   Future<bool> deleteUser(int id) async {
     try {
-      final response = await http.delete(
+      final response = await _makeRequest(() => http.delete(
         Uri.parse('$_baseUrl/users/$id'),
         headers: defaultHeaders,
-      );
+      ));
 
       // ReqRes API returns 204 for successful deletion
       if (response.statusCode == 204 || response.statusCode == 200) {
